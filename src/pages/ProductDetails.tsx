@@ -22,7 +22,7 @@ const ProductDetails = () => {
   }
 
   const discount = Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
-  const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=I want to order ${product.name} - $${product.price}`;
+  const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=I want to order ${product.name} - ₹${product.price}`;
 
   return (
     <div className="container mx-auto px-4 py-6">
@@ -32,8 +32,8 @@ const ProductDetails = () => {
 
       <div className="grid md:grid-cols-2 gap-8">
         {/* Image */}
-        <div className="bg-card rounded-lg p-8 shadow-card flex items-center justify-center">
-          <div className="text-9xl">{product.category === "phone" ? "📱" : "💻"}</div>
+        <div className="glass-card rounded-lg p-8 flex items-center justify-center animate-fade-in">
+          <div className="text-9xl animate-scale-in">{product.category === "phone" ? "📱" : "💻"}</div>
         </div>
 
         {/* Info */}

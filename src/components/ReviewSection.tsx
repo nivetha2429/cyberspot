@@ -8,7 +8,7 @@ const ReviewSection = ({ productId }: { productId?: string }) => {
   return (
     <div className="space-y-4">
       {filtered.map((review) => (
-        <div key={review.id} className="bg-card rounded-lg p-4 shadow-card">
+        <div key={review.id} className="glass-card rounded-lg p-4">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full gradient-peach flex items-center justify-center text-primary-foreground text-sm font-semibold">

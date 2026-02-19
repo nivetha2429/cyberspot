@@ -9,7 +9,7 @@ const ProductCard = ({ product }: { product: Product }) => {
   const discount = Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
 
   return (
-    <div className="bg-card rounded-lg p-4 shadow-card hover-lift group animate-fade-in">
+    <div className="glass-card rounded-lg p-4 group animate-fade-in">
       <Link to={`/product/${product.id}`}>
         <div className="relative aspect-square overflow-hidden bg-secondary/50 group-hover:scale-105 transition-transform duration-500">
           {product.images?.[0] ? (

@@ -27,9 +27,9 @@ const Cart = () => {
       <div className="grid md:grid-cols-3 gap-6">
         <div className="md:col-span-2 space-y-3">
           {items.map((item) => (
-            <div key={item.product.id} className="bg-card rounded-lg p-4 shadow-card flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <div key={item.product.id} className="glass-card rounded-lg p-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <div className="flex items-center gap-4 w-full sm:w-auto">
-                <div className="w-16 h-16 rounded-lg bg-secondary flex items-center justify-center shrink-0 text-3xl">
+                <div className="w-16 h-16 rounded-lg bg-white/40 flex items-center justify-center shrink-0 text-3xl">
                   {item.product.category === "phone" ? "📱" : "💻"}
                 </div>
                 <div className="flex-1 min-w-0 sm:hidden">
@@ -45,11 +45,11 @@ const Cart = () => {
 
               <div className="flex items-center justify-between w-full sm:w-auto gap-4 mt-2 sm:mt-0">
                 <div className="flex items-center gap-2">
-                  <button onClick={() => updateQuantity(item.product.id, item.quantity - 1)} className="w-8 h-8 rounded-md border border-border flex items-center justify-center hover:bg-secondary">
+                  <button onClick={() => updateQuantity(item.product.id, item.quantity - 1)} className="w-8 h-8 rounded-md border border-border flex items-center justify-center hover:bg-white/50">
                     <Minus className="w-3 h-3" />
                   </button>
                   <span className="w-8 text-center font-medium text-sm">{item.quantity}</span>
-                  <button onClick={() => updateQuantity(item.product.id, item.quantity + 1)} className="w-8 h-8 rounded-md border border-border flex items-center justify-center hover:bg-secondary">
+                  <button onClick={() => updateQuantity(item.product.id, item.quantity + 1)} className="w-8 h-8 rounded-md border border-border flex items-center justify-center hover:bg-white/50">
                     <Plus className="w-3 h-3" />
                   </button>
                 </div>
@@ -65,7 +65,7 @@ const Cart = () => {
         </div>
 
         {/* Summary */}
-        <div className="bg-card rounded-lg p-6 shadow-card h-fit">
+        <div className="glass rounded-lg p-6 h-fit">
           <h3 className="font-bold text-foreground mb-4">Order Summary</h3>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between text-muted-foreground">

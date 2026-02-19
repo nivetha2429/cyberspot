@@ -70,7 +70,7 @@ const Shop = () => {
       <div className="flex flex-col md:flex-row gap-6">
         {/* Sidebar Filters */}
         <aside className={`${showFilters ? "block" : "hidden"} md:block w-full md:w-56 shrink-0`}>
-          <div className="bg-card rounded-lg p-4 shadow-card space-y-5">
+          <div className="glass-card rounded-lg p-4 space-y-5">
             <div>
               <h3 className="font-semibold text-foreground text-sm mb-2">Category</h3>
               <div className="space-y-1.5">

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Lock } from "lucide-react";
 import { toast } from "sonner";
@@ -8,12 +8,18 @@ const AdminLogin = () => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (localStorage.getItem("techzone_admin")) {
+      navigate("/admin/dashboard", { replace: true });
+    }
+  }, [navigate]);
+
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (email === "admin@techzone.com" && password === "admin123") {
       localStorage.setItem("techzone_admin", "true");
       toast.success("Welcome, Admin!");
-      navigate("/admin/dashboard");
+      navigate("/admin/dashboard", { replace: true });
     } else {
       toast.error("Invalid credentials");
     }

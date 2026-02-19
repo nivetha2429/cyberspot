@@ -14,9 +14,7 @@ const Offers = () => (
             </div>
             <div>
               <h3 className="font-bold text-foreground">{offer.title}</h3>
-              <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${offer.active ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
-                {offer.active ? "Active" : "Expired"}
-              </span>
+              <p className="text-sm text-foreground/70">{offer.description}</p>
             </div>
           </div>
           <p className="text-3xl font-extrabold text-primary mb-3">{offer.discount}% OFF</p>

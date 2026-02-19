@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Smartphone, Laptop, Tag, Truck, Shield, Award, Headphones, Star } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
-import ReviewSection from "@/components/ReviewSection";
+
 import { OfferPopup } from "@/components/OfferPopup";
 import { useData } from "@/context/DataContext";
 import heroBanner from "@/assets/hero-banner.jpg";
@@ -29,11 +29,11 @@ const Index = () => {
       {/* Hero */}
       <section className="relative overflow-hidden rounded-2xl mx-4 mt-4 shadow-soft">
         <img src={heroBanner} alt="Summer Sale" className="w-full h-[300px] md:h-80 object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-r from-foreground/40 to-transparent flex items-center">
-          <div className="px-6 md:px-12 w-full">
-            <h1 className="text-2xl md:text-5xl font-extrabold text-card mb-2">Summer Sale</h1>
-            <p className="text-lg md:text-3xl font-bold text-card/90 mb-4">50% OFF on All Products</p>
-            <Link to="/shop" className="inline-block gradient-peach text-primary-foreground px-5 py-2 md:px-6 md:py-3 rounded-lg font-semibold text-sm md:text-base hover:opacity-90 transition-opacity shadow-soft">
+        <div className="absolute inset-0 flex items-center p-4 md:p-12">
+          <div className="glass p-6 md:p-8 rounded-2xl max-w-lg transform transition-all hover:scale-105 duration-500">
+            <h1 className="text-2xl md:text-5xl font-extrabold text-foreground mb-2 text-glow">Summer Sale</h1>
+            <p className="text-lg md:text-3xl font-bold text-foreground/90 mb-4">50% OFF on All Products</p>
+            <Link to="/shop" className="inline-block gradient-peach text-primary-foreground px-5 py-2 md:px-6 md:py-3 rounded-lg font-semibold text-sm md:text-base hover:opacity-90 transition-opacity shadow-lg">
               Shop Now
             </Link>
           </div>
@@ -67,10 +67,10 @@ const Index = () => {
 
       {/* Categories */}
       <section className="container mx-auto px-4 mt-10">
-        <h2 className="text-xl md:text-2xl font-bold text-foreground mb-6">Shop by Category</h2>
+        <h2 className="text-xl md:text-2xl font-bold text-foreground mb-6 text-glow">Shop by Category</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
           {categories.map((c) => (
-            <Link key={c.name} to={c.link} className="bg-card rounded-lg p-6 shadow-card hover:shadow-soft transition-all text-center group">
+            <Link key={c.name} to={c.link} className="glass-card rounded-lg p-6 text-center group">
               <c.icon className="w-8 h-8 md:w-10 md:h-10 mx-auto text-primary mb-2 group-hover:scale-110 transition-transform" />
               <span className="font-medium text-foreground text-sm">{c.name}</span>
             </Link>
@@ -78,15 +78,9 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Reviews */}
-      <section className="container mx-auto px-4 mt-10">
-        <h2 className="text-xl md:text-2xl font-bold text-foreground mb-6">Customer Reviews</h2>
-        <ReviewSection />
-      </section>
-
       {/* Newsletter */}
       <section className="container mx-auto px-4 mt-10 mb-8">
-        <div className="bg-card rounded-lg p-6 shadow-card text-center">
+        <div className="glass rounded-lg p-6 text-center">
           <h3 className="text-lg font-bold text-foreground mb-2">Stay Updated</h3>
           <p className="text-sm text-muted-foreground mb-4">Subscribe for the latest deals and offers.</p>
           <div className="flex flex-col sm:flex-row max-w-md mx-auto gap-2">

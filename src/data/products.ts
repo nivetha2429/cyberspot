@@ -25,6 +25,7 @@ export interface Review {
 export interface Offer {
   id: string;
   title: string;
+  description: string;
   discount: number;
   image?: string;
   active: boolean;
@@ -154,8 +155,8 @@ export const reviews: Review[] = [
 ];
 
 export const offers: Offer[] = [
-  { id: "1", title: "Summer Sale - 50% OFF on All Products!", discount: 50, active: true },
-  { id: "2", title: "Buy 2 Get 1 Free on Accessories", discount: 30, active: false },
+  { id: "1", title: "Summer Sale", description: "Get huge discounts on all electronic items this summer!", discount: 50, active: true },
+  { id: "2", title: "Accessories Deal", description: "Buy 2 accessories and get 1 absolutely free.", discount: 30, active: false },
 ];
 
 export const WHATSAPP_NUMBER = "91XXXXXXXXXX";

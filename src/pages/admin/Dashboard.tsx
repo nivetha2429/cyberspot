@@ -32,7 +32,7 @@ const AdminDashboard = () => {
 
   // Form State
   const [formData, setFormData] = useState<Partial<Product>>({
-    name: "", brand: "", category: "phone", price: 0, originalPrice: 0, description: "", specifications: []
+    name: "", brand: "", category: "phone", price: 0, originalPrice: 0, description: "", specifications: [], rating: 0, reviewCount: 0
   });
 
   const handleEdit = (product: Product) => {
@@ -52,12 +52,13 @@ const AdminDashboard = () => {
     e.preventDefault();
     const productData = {
       ...formData,
+      category: formData.category || "phone",
       id: editingProduct ? editingProduct.id : Date.now().toString(),
-      rating: editingProduct ? editingProduct.rating : 0,
-      reviewCount: editingProduct ? editingProduct.reviewCount : 0,
+      rating: formData.rating || 0,
+      reviewCount: formData.reviewCount || 0,
       images: [],
       featured: formData.featured || false,
-      specifications: typeof formData.specifications === 'string' ? (formData.specifications as string).split(',') : formData.specifications || []
+      specifications: Array.isArray(formData.specifications) ? formData.specifications.filter(s => s.trim() !== "") : []
     } as Product;
 
     if (editingProduct) {
@@ -87,7 +88,7 @@ const AdminDashboard = () => {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {stats.map((s) => (
-          <div key={s.label} className="bg-card rounded-lg p-5 shadow-card">
+          <div key={s.label} className="glass-card rounded-lg p-5">
             <div className={`w-10 h-10 rounded-lg ${s.color} flex items-center justify-center mb-3`}>
               <s.icon className="w-5 h-5" />
             </div>
@@ -116,13 +117,17 @@ const AdminDashboard = () => {
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-semibold text-foreground">Products</h2>
-            <button onClick={() => { setEditingProduct(null); setFormData({}); setShowProductForm(true); }} className="gradient-peach text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90">
+            <button onClick={() => {
+              setEditingProduct(null);
+              setFormData({ name: "", brand: "", category: "phone", price: 0, originalPrice: 0, description: "", specifications: [], rating: 0, reviewCount: 0 });
+              setShowProductForm(true);
+            }} className="gradient-peach text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90">
               + Add Product
             </button>
           </div>
 
           {showProductForm && (
-            <div className="bg-card p-6 rounded-lg shadow-card animate-fade-in relative">
+            <div className="glass p-6 rounded-lg relative animate-fade-in">
               <button onClick={() => setShowProductForm(false)} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"><X className="w-5 h-5" /></button>
               <h3 className="font-bold mb-4">{editingProduct ? "Edit Product" : "Add New Product"}</h3>
               <form onSubmit={handleSubmit} className="grid md:grid-cols-2 gap-4">
@@ -135,7 +140,10 @@ const AdminDashboard = () => {
                 <input required type="number" placeholder="Price" value={formData.price || ""} onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })} className="input-field" />
                 <input required type="number" placeholder="Original Price" value={formData.originalPrice || ""} onChange={(e) => setFormData({ ...formData, originalPrice: Number(e.target.value) })} className="input-field" />
                 <input placeholder="Image URL (optional)" value={formData.images?.[0] || ""} onChange={(e) => setFormData({ ...formData, images: e.target.value ? [e.target.value] : [] })} className="input-field md:col-span-2" />
+                <input type="number" step="0.1" min="0" max="5" placeholder="Rating (0-5)" value={formData.rating || ""} onChange={(e) => setFormData({ ...formData, rating: Number(e.target.value) })} className="input-field" />
+                <input type="number" min="0" placeholder="Review Count" value={formData.reviewCount || ""} onChange={(e) => setFormData({ ...formData, reviewCount: Number(e.target.value) })} className="input-field" />
                 <textarea required placeholder="Description" value={formData.description || ""} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="input-field md:col-span-2" />
+                <textarea required placeholder="Specifications (one per line)" value={Array.isArray(formData.specifications) ? formData.specifications.join('\n') : formData.specifications || ""} onChange={(e) => setFormData({ ...formData, specifications: e.target.value.split('\n') })} className="input-field md:col-span-2 h-32" />
                 <div className="md:col-span-2">
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input type="checkbox" checked={formData.featured || false} onChange={(e) => setFormData({ ...formData, featured: e.target.checked })} className="accent-primary" />
@@ -147,9 +155,9 @@ const AdminDashboard = () => {
             </div>
           )}
 
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto glass rounded-lg">
             <table className="w-full text-sm text-left">
-              <thead className="bg-secondary text-muted-foreground uppercase text-xs">
+              <thead className="bg-white/50 text-muted-foreground uppercase text-xs">
                 <tr>
                   <th className="p-3">Name</th>
                   <th className="p-3">Brand</th>
@@ -159,7 +167,7 @@ const AdminDashboard = () => {
               </thead>
               <tbody>
                 {products.map((p) => (
-                  <tr key={p.id} className="border-b border-border hover:bg-secondary/50">
+                  <tr key={p.id} className="border-b border-border hover:bg-white/30 transition-colors">
                     <td className="p-3 font-medium text-foreground">{p.name}</td>
                     <td className="p-3 text-muted-foreground">{p.brand}</td>
                     <td className="p-3 text-foreground">₹{p.price}</td>
@@ -182,14 +190,14 @@ const AdminDashboard = () => {
             {/* Simple Add Offer for demo */}
             <button onClick={() => {
               const title = prompt("Enter Offer Title:");
-              if (title) addOffer({ id: Date.now().toString(), title, discount: 10, active: true });
+              if (title) addOffer({ id: Date.now().toString(), title, description: "Limited time offer!", discount: 10, active: true });
             }} className="gradient-peach text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90">
               + Add Offer
             </button>
           </div>
           <div className="grid gap-4">
             {offers.map((offer) => (
-              <div key={offer.id} className="bg-card p-4 rounded-lg shadow-card flex justify-between items-center">
+              <div key={offer.id} className="glass-card p-4 rounded-lg flex justify-between items-center">
                 <div>
                   <h3 className="font-bold text-foreground">{offer.title}</h3>
                   <p className="text-sm text-muted-foreground">{offer.discount}% Discount • {offer.active ? "Active" : "Inactive"}</p>
@@ -207,9 +215,9 @@ const AdminDashboard = () => {
       {activeTab === "reviews" && (
         <div className="space-y-4">
           <h2 className="text-xl font-semibold text-foreground">Reviews</h2>
-          <div className="space-y-4">
+          <div className="space-y-4 animate-stagger">
             {reviews.map((review) => (
-              <div key={review.id} className="bg-card p-4 rounded-lg shadow-card flex justify-between items-start">
+              <div key={review.id} className="glass-card p-4 rounded-lg flex justify-between items-start">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <span className="font-bold text-foreground">{review.name}</span>

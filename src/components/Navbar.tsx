@@ -9,7 +9,7 @@ const Navbar = () => {
   const [search, setSearch] = useState("");
 
   return (
-    <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-md shadow-card transition-all duration-300">
+    <header className="sticky top-0 z-50 glass-nav transition-all duration-300">
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between gap-4">
           <Link to="/" className="flex items-center gap-2 shrink-0 mr-2">
