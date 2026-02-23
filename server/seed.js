@@ -15,9 +15,17 @@ const initialProducts = [
 
 const seedDB = async () => {
     try {
-        const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/cyberspot';
-        await mongoose.connect(MONGODB_URI);
-        console.log('Connected to MongoDB for seeding...');
+        let MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/cyberspot';
+
+        try {
+            await mongoose.connect(MONGODB_URI, { serverSelectionTimeoutMS: 2000 });
+            console.log('Connected to MongoDB for seeding...');
+        } catch (e) {
+            console.log('Primary MongoDB not reachable, seeding to Memory Server (testing only)...');
+            const mongoServer = await MongoMemoryServer.create();
+            MONGODB_URI = mongoServer.getUri();
+            await mongoose.connect(MONGODB_URI);
+        }
 
         await Product.deleteMany({});
         console.log('Cleared existing products');
