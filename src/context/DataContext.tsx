@@ -21,18 +21,42 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 export const DataProvider = ({ children }: { children: ReactNode }) => {
     const [products, setProducts] = useState<Product[]>(() => {
-        const saved = localStorage.getItem("products");
-        return saved ? JSON.parse(saved) : initialProducts;
+        try {
+            const saved = localStorage.getItem("products");
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                return Array.isArray(parsed) ? parsed : initialProducts;
+            }
+        } catch (e) {
+            console.error("Error loading products from localStorage", e);
+        }
+        return initialProducts;
     });
 
     const [reviews, setReviews] = useState<Review[]>(() => {
-        const saved = localStorage.getItem("reviews");
-        return saved ? JSON.parse(saved) : initialReviews;
+        try {
+            const saved = localStorage.getItem("reviews");
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                return Array.isArray(parsed) ? parsed : initialReviews;
+            }
+        } catch (e) {
+            console.error("Error loading reviews from localStorage", e);
+        }
+        return initialReviews;
     });
 
     const [offers, setOffers] = useState<Offer[]>(() => {
-        const saved = localStorage.getItem("offers");
-        return saved ? JSON.parse(saved) : initialOffers;
+        try {
+            const saved = localStorage.getItem("offers");
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                return Array.isArray(parsed) ? parsed : initialOffers;
+            }
+        } catch (e) {
+            console.error("Error loading offers from localStorage", e);
+        }
+        return initialOffers;
     });
 
     // Fetch products from API on mount
@@ -42,7 +66,12 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
                 const response = await fetch(`${API_URL}/products`);
                 if (response.ok) {
                     const data = await response.json();
-                    setProducts(data);
+                    const mappedData = data.map((p: any) => ({
+                        ...p,
+                        id: p._id || p.id,
+                        featured: p.isFeatured || p.featured
+                    }));
+                    setProducts(mappedData);
                 }
             } catch (error) {
                 console.error("Failed to fetch products from API:", error);

@@ -8,10 +8,11 @@ const Shop = () => {
   const { products } = useData();
   const [searchParams] = useSearchParams();
   const initialCategory = searchParams.get("category") || "";
+  const initialBrand = searchParams.get("brand") || "";
 
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState(initialCategory);
-  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const [selectedBrands, setSelectedBrands] = useState<string[]>(initialBrand ? [initialBrand] : []);
   const [sortBy, setSortBy] = useState("featured");
   const [showFilters, setShowFilters] = useState(false);
 

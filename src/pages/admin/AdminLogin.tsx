@@ -2,23 +2,34 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Lock } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/context/AuthContext";
 
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (localStorage.getItem("techzone_admin")) {
+    if (localStorage.getItem("aaro_admin")) {
       navigate("/admin/dashboard", { replace: true });
     }
   }, [navigate]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (email === "admin@techzone.com" && password === "admin123") {
-      localStorage.setItem("techzone_admin", "true");
-      toast.success("Welcome back!");
+    if (email === "admin@aaro.com" && password === "admin123") {
+      const adminUser = {
+        id: "admin-id",
+        name: "Admin User",
+        email: "admin@aaro.com",
+        role: "admin" as const
+      };
+
+      localStorage.setItem("aaro_admin", "true");
+      login("demo-admin-token", adminUser);
+
+      toast.success("Welcome back, Admin!");
       navigate("/admin/dashboard", { replace: true });
     } else {
       toast.error("Invalid credentials.");
@@ -51,7 +62,7 @@ const AdminLogin = () => {
             Login
           </button>
         </div>
-        <p className="text-xs text-muted-foreground text-center mt-4">Demo: admin@techzone.com / admin123</p>
+        <p className="text-xs text-muted-foreground text-center mt-4">Demo: admin@aaro.com / admin123</p>
       </form>
     </div>
   );

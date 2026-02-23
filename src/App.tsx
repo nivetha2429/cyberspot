@@ -1,9 +1,10 @@
 import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { CartProvider } from "@/context/CartContext";
 import { DataProvider } from "@/context/DataContext";
+import { AuthProvider, useAuth } from "@/context/AuthContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
@@ -15,40 +16,67 @@ import ProductDetails from "./pages/ProductDetails";
 import Cart from "./pages/Cart";
 import OrderForm from "./pages/OrderForm";
 import Offers from "./pages/Offers";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import MyOrders from "./pages/MyOrders";
+import Profile from "./pages/Profile";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/Dashboard";
+import AdminOrders from "./pages/admin/AdminOrders";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+const ProtectedRoute = ({ children, adminOnly = false }: { children: React.ReactNode, adminOnly?: boolean }) => {
+  const { isAuthenticated, isAdmin, loading } = useAuth() as any; // loading state can be added if needed
+
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (adminOnly && !isAdmin) return <Navigate to="/" replace />;
+
+  return <>{children}</>;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <BrowserRouter>
-        <DataProvider>
-          <CartProvider>
-            <Toaster richColors position="bottom-right" />
-            <Navbar />
-            <main className="min-h-screen">
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/shop" element={<Shop />} />
-                <Route path="/phones" element={<Phones />} />
-                <Route path="/laptops" element={<Laptops />} />
-                <Route path="/product/:id" element={<ProductDetails />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/order" element={<OrderForm />} />
-                <Route path="/offers" element={<Offers />} />
-                <Route path="/admin" element={<AdminLogin />} />
-                <Route path="/admin/dashboard" element={<AdminDashboard />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </main>
-            <Footer />
-            <WhatsAppButton />
-          </CartProvider>
-        </DataProvider>
-      </BrowserRouter>
+      <AuthProvider>
+        <BrowserRouter>
+          <DataProvider>
+            <CartProvider>
+              <Toaster richColors position="bottom-right" />
+              <Navbar />
+              <main className="min-h-screen">
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/shop" element={<Shop />} />
+                  <Route path="/phones" element={<Phones />} />
+                  <Route path="/laptops" element={<Laptops />} />
+                  <Route path="/product/:id" element={<ProductDetails />} />
+                  <Route path="/cart" element={<Cart />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+
+                  {/* Customer Routes */}
+                  <Route path="/order" element={<ProtectedRoute><OrderForm /></ProtectedRoute>} />
+                  <Route path="/my-orders" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
+                  <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+
+                  <Route path="/offers" element={<Offers />} />
+
+                  {/* Admin Routes */}
+                  <Route path="/admin" element={<AdminLogin />} />
+                  <Route path="/admin/dashboard" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
+                  <Route path="/admin/orders" element={<ProtectedRoute adminOnly><AdminOrders /></ProtectedRoute>} />
+
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </main>
+              <Footer />
+              <WhatsAppButton />
+            </CartProvider>
+          </DataProvider>
+        </BrowserRouter>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

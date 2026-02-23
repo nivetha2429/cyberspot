@@ -19,6 +19,15 @@ const features = [
   { icon: Headphones, label: "24/7 Support" },
 ];
 
+const PHONE_BRANDS = [
+  "Apple", "Samsung", "Oppo", "Vivo", "Lava", "Realme", "OnePlus",
+  "Nothing", "Tecno", "Infinix", "Motorola", "Google", "Xiaomi", "Honor"
+];
+
+const LAPTOP_BRANDS = [
+  "Dell", "HP", "Lenovo", "Apple", "Asus", "Acer", "Samsung", "Microsoft", "MSI"
+];
+
 const Index = () => {
   const { products } = useData();
   const featured = products.filter((p) => p.featured);
@@ -75,6 +84,55 @@ const Index = () => {
               <span className="font-medium text-foreground text-sm">{c.name}</span>
             </Link>
           ))}
+        </div>
+      </section>
+
+      {/* Brands Showcase */}
+      <section className="container mx-auto px-4 mt-16 group">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+          <div>
+            <h2 className="text-2xl md:text-4xl font-black text-foreground mb-2 text-glow">Shop by Brand</h2>
+            <p className="text-muted-foreground text-sm md:text-base">Explore our wide range of premium electronics from global leaders.</p>
+          </div>
+          <div className="h-1 w-20 bg-primary rounded-full hidden md:block mb-3 animate-pulse" />
+        </div>
+
+        <div className="space-y-10">
+          {/* Phone Brands */}
+          <div className="animate-fade-in" style={{ animationDelay: "100ms" }}>
+            <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-primary mb-4 flex items-center gap-3">
+              <Smartphone className="w-4 h-4" /> Phone Brands
+            </h3>
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-9 gap-2 md:gap-3">
+              {Array.from(new Set(products.filter(p => p.category === 'phone').map(p => p.brand))).sort().map((brand) => (
+                <Link
+                  key={brand}
+                  to={`/shop?brand=${brand}`}
+                  className="glass-card px-3 py-4 text-center rounded-xl hover:bg-primary/5 transition-all group/brand"
+                >
+                  <span className="text-xs font-bold text-foreground group-hover/brand:text-primary transition-colors">{brand}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Laptop Brands */}
+          <div className="animate-fade-in" style={{ animationDelay: "200ms" }}>
+            <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-primary mb-4 flex items-center gap-3">
+              <Laptop className="w-4 h-4" /> Laptop Brands
+            </h3>
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-9 gap-2 md:gap-3">
+              {Array.from(new Set(products.filter(p => p.category === 'laptop').map(p => p.brand))).sort().map((brand) => (
+                <Link
+                  key={brand}
+                  to={`/shop?brand=${brand}`}
+                  className="glass-card px-3 py-4 text-center rounded-xl hover:bg-primary/5 transition-all group/brand"
+                >
+                  <span className="text-xs font-bold text-foreground group-hover/brand:text-primary transition-colors">{brand}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 

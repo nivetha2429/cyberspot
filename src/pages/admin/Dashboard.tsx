@@ -17,11 +17,11 @@ const AdminDashboard = () => {
   ];
 
   useEffect(() => {
-    if (!localStorage.getItem("techzone_admin")) navigate("/admin");
+    if (!localStorage.getItem("aaro_admin")) navigate("/admin");
   }, [navigate]);
 
   const handleLogout = () => {
-    localStorage.removeItem("techzone_admin");
+    localStorage.removeItem("aaro_admin");
     navigate("/admin");
   };
 
