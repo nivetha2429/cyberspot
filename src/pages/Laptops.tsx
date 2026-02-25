@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Search, SlidersHorizontal } from "lucide-react";
+import { Search, SlidersHorizontal, Check, Laptop } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
 import { useData } from "@/context/DataContext";
 
@@ -27,67 +27,85 @@ const Laptops = () => {
   }, [allLaptops, search, selectedBrands]);
 
   return (
-    <div className="container mx-auto px-4 py-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-        <h1 className="text-3xl font-bold text-foreground text-glow whitespace-nowrap">Laptops</h1>
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10 border-b border-primary/10 pb-6">
+        <div>
+          <h1 className="text-glow mb-1">Laptops & PCs</h1>
+          <p className="text-xs text-muted-foreground font-medium uppercase tracking-widest opacity-70">Premium Computing Range</p>
+        </div>
 
-        <div className="flex gap-2 w-full md:max-w-md">
-          <div className="relative flex-1">
+        <div className="flex items-center gap-2 w-full md:max-w-md h-12">
+          <div className="relative flex-1 h-full">
             <input
               type="text"
               placeholder="Search laptop models..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="w-full h-full pl-11 pr-4 rounded-xl border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium shadow-soft"
             />
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           </div>
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="md:hidden flex items-center gap-2 px-4 py-2 rounded-lg border border-border bg-card text-sm"
+            className="lg:hidden h-full flex items-center justify-center px-4 rounded-xl border border-border bg-card text-primary hover:bg-primary/10 transition-all"
           >
-            <SlidersHorizontal className="w-4 h-4" />
+            <SlidersHorizontal className="w-5 h-5" />
           </button>
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-6">
+      <div className="flex flex-col lg:flex-row gap-8">
         {/* Brand Filter Sidebar */}
-        <aside className={`${showFilters ? "block" : "hidden"} md:block w-full md:w-60 shrink-0`}>
-          <div className="glass-card rounded-lg p-5 sticky top-24">
-            <h3 className="font-bold text-foreground mb-4">Brands</h3>
-            <div className="grid grid-cols-2 md:grid-cols-1 gap-y-2.5">
+        <aside className={`${showFilters ? "block" : "hidden"} lg:block w-full lg:w-64 shrink-0`}>
+          <div className="glass-card rounded-[2rem] p-6 sticky top-24 border border-white/40 shadow-xl shadow-primary/5">
+            <h3 className="text-xs font-black uppercase tracking-widest text-foreground border-b border-primary/10 pb-3 mb-6">Filter by Brand</h3>
+            <div className="grid grid-cols-2 lg:grid-cols-1 gap-3">
               {brands.map((brand) => (
-                <label key={brand} className="flex items-center gap-2.5 text-sm cursor-pointer group">
+                <label key={brand} className="flex items-center gap-3 text-sm cursor-pointer group">
+                  <div className={`w-5 h-5 rounded-md border-2 transition-all flex items-center justify-center ${selectedBrands.includes(brand) ? "bg-primary border-primary" : "border-border group-hover:border-primary/50"}`}>
+                    {selectedBrands.includes(brand) && <Check className="w-3 h-3 text-white" />}
+                  </div>
                   <input
                     type="checkbox"
+                    className="hidden"
                     checked={selectedBrands.includes(brand)}
                     onChange={() => toggleBrand(brand)}
-                    className="accent-primary w-4 h-4 rounded"
                   />
-                  <span className="text-foreground group-hover:text-primary transition-colors">{brand}</span>
+                  <span className={`font-bold transition-colors ${selectedBrands.includes(brand) ? "text-primary" : "text-muted-foreground group-hover:text-foreground"}`}>{brand}</span>
                 </label>
               ))}
             </div>
+            {(selectedBrands.length > 0) && (
+              <button
+                onClick={() => setSelectedBrands([])}
+                className="mt-8 text-[10px] font-black uppercase tracking-widest text-primary hover:underline w-full text-center"
+              >
+                Clear Selection
+              </button>
+            )}
           </div>
         </aside>
 
         {/* Product Grid */}
         <div className="flex-1">
           {filteredLaptops.length > 0 ? (
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 animate-slide-up">
+            <div className="grid grid-cols-1 xs:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
               {filteredLaptops.map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}
             </div>
           ) : (
-            <div className="text-center py-20 glass-card rounded-lg">
-              <p className="text-muted-foreground">No laptops match your current filters.</p>
+            <div className="py-24 glass-card rounded-[2.5rem] flex flex-col items-center justify-center text-center px-10 border border-dashed border-primary/20 bg-primary/5">
+              <div className="w-20 h-20 bg-background/50 rounded-full flex items-center justify-center mb-6 shadow-inner">
+                <Laptop className="w-10 h-10 text-muted-foreground/50" />
+              </div>
+              <h2 className="text-2xl font-black text-foreground mb-2">No Laptops Found</h2>
+              <p className="text-muted-foreground max-w-xs mb-8">We couldn't find any products matching your specific filters.</p>
               <button
                 onClick={() => { setSearch(""); setSelectedBrands([]); }}
-                className="mt-4 text-primary font-medium hover:underline text-sm"
+                className="gradient-purple text-primary-foreground px-8 py-3.5 rounded-2xl font-black hover:opacity-90 transition-all shadow-xl shadow-primary/20"
               >
-                Clear all filters
+                Reset Filters
               </button>
             </div>
           )}

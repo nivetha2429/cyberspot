@@ -36,21 +36,7 @@ const Register = () => {
                 toast.error(data.message || "Registration failed");
             }
         } catch (err) {
-            // Demo Fallback
-            if (form.name && form.email && form.password.length >= 6) {
-                const dummyUser = {
-                    id: "u-" + Date.now(),
-                    name: form.name,
-                    email: form.email,
-                    phone: form.phone,
-                    role: "customer" as const
-                };
-                login("demo-token", dummyUser);
-                toast.success("Account created (Demo Mode)");
-                navigate("/shop");
-            } else {
-                toast.error("Connection failed. Is the server running?");
-            }
+            toast.error("Connection failed. Is the server running?");
         } finally {
             setLoading(false);
         }
@@ -59,8 +45,8 @@ const Register = () => {
     return (
         <div className="min-h-[70vh] flex items-center justify-center px-4 py-12 animate-fade-in">
             <div className="bg-card rounded-2xl p-8 shadow-soft w-full max-w-sm border border-border">
-                <div className="w-14 h-14 rounded-xl gradient-purple mx-auto flex items-center justify-center mb-6 shadow-lg shadow-primary/20">
-                    <UserPlus className="w-7 h-7 text-primary-foreground" />
+                <div className="w-14 h-14 rounded-xl gradient-dark mx-auto flex items-center justify-center mb-6 shadow-lg shadow-slate-900/20">
+                    <UserPlus className="w-7 h-7 text-white" />
                 </div>
                 <h2 className="text-2xl font-bold text-foreground text-center mb-2">Create Account</h2>
                 <p className="text-muted-foreground text-center text-sm mb-8">Join AARO Systems today</p>
@@ -110,7 +96,7 @@ const Register = () => {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full gradient-purple text-primary-foreground py-3 rounded-xl font-bold hover:opacity-90 transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
+                        className="w-full gradient-dark text-white py-3 rounded-xl font-bold hover:opacity-90 transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-slate-900/10 disabled:opacity-50"
                     >
                         {loading ? "Creating Account..." : "Register"}
                     </button>

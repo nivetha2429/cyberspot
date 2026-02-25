@@ -39,7 +39,7 @@ const Footer = () => (
             <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center md:justify-start gap-3 text-sm text-muted-foreground hover:text-primary transition-all group">
               <Instagram className="w-5 h-5 group-hover:scale-110" /> @aarosystems
             </a>
-            <a href="https://github.com/nivetha2429/cyberspot" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center md:justify-start gap-3 text-sm text-muted-foreground hover:text-primary transition-all group">
+            <a href="https://github.com/nivetha2429/aaro" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center md:justify-start gap-3 text-sm text-muted-foreground hover:text-primary transition-all group">
               <Github className="w-5 h-5 group-hover:scale-110" /> GitHub
             </a>
           </div>

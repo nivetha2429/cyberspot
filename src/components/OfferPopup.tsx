@@ -1,13 +1,15 @@
-import { X, Tag, Sparkles, Copy, Check } from "lucide-react";
+import { X, Tag, Sparkles, Copy, Check, ArrowRight } from "lucide-react";
 import { useState, useEffect } from "react";
-import { offers } from "@/data/products";
+import { useData } from "@/context/DataContext";
 import { Link } from "react-router-dom";
 import summerSaleImg from "@/assets/summer-sale-bg.png";
 
 export const OfferPopup = () => {
+  const { offers } = useData();
   const [open, setOpen] = useState(false);
   const [minimized, setMinimized] = useState(false);
   const [copied, setCopied] = useState(false);
+
   const activeOffer = offers.find((o) => o.active);
 
   useEffect(() => {
@@ -29,7 +31,16 @@ export const OfferPopup = () => {
   const handleClose = (e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     setOpen(false);
+    // When manually closed, we keep it as a minimized tag so users can still access it
     setMinimized(true);
+  };
+
+  const handleDismissForever = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setOpen(false);
+    setMinimized(false);
+    // Optional: could set a flag in sessionStorage to hide the tag too
+    sessionStorage.setItem("dismissedOffer", "true");
   };
 
   const handleMaximize = () => {
@@ -38,38 +49,44 @@ export const OfferPopup = () => {
   };
 
   const copyCode = () => {
-    navigator.clipboard.writeText("SUMMER50");
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    if (activeOffer) {
+      navigator.clipboard.writeText(activeOffer.code);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
-  if (!activeOffer) return null;
+  // If already dismissed in this session, don't show anything
+  const isDismissed = sessionStorage.getItem("dismissedOffer") === "true";
+
+  if (!activeOffer || isDismissed) return null;
 
   return (
     <>
       {/* Main Popup */}
       {open && (
-        <div 
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-foreground/60 backdrop-blur-md animate-fade-in"
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/30 backdrop-blur-sm animate-fade-in"
           onClick={() => handleClose()}
         >
-          <div 
+          <div
             className="bg-card w-full max-w-4xl overflow-hidden rounded-[2rem] shadow-2xl relative animate-scale-in flex flex-col md:flex-row"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}
-            <button 
-              onClick={() => handleClose()} 
+            <button
+              onClick={() => handleClose()}
               className="absolute top-4 right-4 z-10 p-2 rounded-full bg-background/50 backdrop-blur-sm text-foreground hover:bg-background/80 transition-all shadow-lg border border-white/20"
+              title="Minimize"
             >
               <X className="w-5 h-5" />
             </button>
 
             {/* Left Side: Image */}
             <div className="w-full md:w-1/2 h-48 md:h-auto relative overflow-hidden group">
-              <img 
-                src={summerSaleImg} 
-                alt="Summer Sale" 
+              <img
+                src={activeOffer.image || summerSaleImg}
+                alt={activeOffer.title}
                 className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
               />
               <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-primary/30 to-transparent" />
@@ -77,7 +94,7 @@ export const OfferPopup = () => {
                 <p className="text-white font-bold text-xs uppercase tracking-widest mb-1 flex items-center gap-2">
                   <Sparkles className="w-3 h-3" /> Limited Time
                 </p>
-                <p className="text-white text-lg md:text-xl font-black">Ends in 24 Hours!</p>
+                <p className="text-white text-lg md:text-xl font-black">Ends Soon!</p>
               </div>
             </div>
 
@@ -87,21 +104,21 @@ export const OfferPopup = () => {
                 <Tag className="w-4 h-4" />
                 <span className="text-xs font-extrabold uppercase tracking-wider">{activeOffer.title}</span>
               </div>
-              
+
               <h3 className="text-3xl md:text-5xl font-black text-foreground mb-4 leading-tight">
-                Get <span className="text-transparent bg-clip-text gradient-purple">50% OFF</span> Everything
+                Get <span className="text-gradient-offer">{activeOffer.discount}% OFF</span> Everything
               </h3>
-              
+
               <p className="text-muted-foreground text-sm md:text-base mb-8 max-w-sm mx-auto md:mx-0">
-                {activeOffer.description} Upgrade your tech game today with our premium summer collection.
+                {activeOffer.description}
               </p>
 
               {/* Promo Code Section */}
               <div className="mb-8 p-4 rounded-2xl bg-secondary/50 border border-dashed border-primary/30 relative">
                 <p className="text-[10px] font-bold uppercase text-muted-foreground mb-2 tracking-tighter">Use code at checkout</p>
                 <div className="flex items-center justify-between">
-                  <span className="text-xl font-mono font-black tracking-widest text-primary">SUMMER50</span>
-                  <button 
+                  <span className="text-xl font-mono font-black tracking-widest text-primary">{activeOffer.code}</span>
+                  <button
                     onClick={copyCode}
                     className="flex items-center gap-2 text-xs font-bold text-primary hover:text-primary/80 transition-colors"
                   >
@@ -115,15 +132,18 @@ export const OfferPopup = () => {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link 
-                  to="/shop" 
-                  onClick={() => handleClose()} 
-                  className="flex-1 gradient-purple text-primary-foreground px-8 py-4 rounded-2xl font-bold text-lg hover:opacity-90 transition-all shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] text-center"
+                <Link
+                  to="/shop"
+                  onClick={() => handleClose()}
+                  className="group flex-1 inline-flex items-center justify-between gap-4 bg-foreground text-background pl-8 pr-2 py-2 rounded-2xl font-black text-lg hover:opacity-90 transition-all shadow-2xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] border border-white/10 hover:shadow-primary/40"
                 >
-                  Shop the Sale
+                  <span>Shop the Sale</span>
+                  <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-white/10 backdrop-blur-sm border-l border-white/20 ml-2">
+                    <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                  </div>
                 </Link>
               </div>
-              
+
               <p className="mt-6 text-[10px] text-muted-foreground italic">
                 *T&C apply. Valid on all phones and laptops. Limited stock available.
               </p>

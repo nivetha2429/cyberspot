@@ -1,7 +1,7 @@
 services:
   # Backend Web Service
   - type: web
-    name: cyberspot-backend
+    name: aaro-backend
     env: node
     plan: free # Use free tier
     rootDir: server
@@ -15,7 +15,7 @@ services:
 
   # Frontend Static Site
   - type: web
-    name: cyberspot-frontend
+    name: aaro-frontend
     env: static
     plan: free # Use free tier
     buildCommand: npm install && npm run build
@@ -24,6 +24,6 @@ services:
       - key: VITE_API_URL
         fromService:
           type: web
-          name: cyberspot-backend
+          name: aaro-backend
           property: host
         path: /api # Append /api to the auto-generated host

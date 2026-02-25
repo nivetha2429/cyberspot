@@ -3,7 +3,8 @@ import {
   Package, ShoppingCart, Star, Tag, LogOut, LayoutDashboard,
   Pencil, Trash2, X, Plus, Users, TrendingUp, Search,
   Menu, Bell, Settings, ChevronRight, Filter, Download,
-  Layers, UserPlus, Eye, CheckCircle2, Clock, BarChart3
+  Layers, UserPlus, Eye, CheckCircle2, Clock, BarChart3,
+  Image as ImageIcon, Video, PlayCircle, FileVideo
 } from "lucide-react";
 import { useData } from "@/context/DataContext";
 import { useAuth } from "@/context/AuthContext";
@@ -37,6 +38,7 @@ const AdminDashboard = () => {
   }, [products]);
 
   const navigate = useNavigate();
+  const totalSales = useMemo(() => orders.reduce((acc, order) => acc + order.totalAmount, 0), [orders]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
 
@@ -73,7 +75,7 @@ const AdminDashboard = () => {
         <div className="h-full flex flex-col p-6">
           <div className="flex items-center justify-between mb-10 px-2">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl gradient-purple flex items-center justify-center shadow-lg shadow-primary/20">
+              <div className="w-10 h-10 rounded-xl gradient-dark flex items-center justify-center shadow-lg shadow-slate-900/20">
                 <Package className="w-6 h-6 text-white" />
               </div>
               <span className="text-xl font-black text-[#1a1f36]">Admin<span className="text-primary italic">Pro</span></span>
@@ -90,7 +92,7 @@ const AdminDashboard = () => {
               { id: "categories", icon: Layers, label: "Categories" },
               { id: "orders", icon: ShoppingCart, label: "Orders" },
               { id: "customers", icon: Users, label: "Customers" },
-              { id: "offers", icon: Tag, label: "Marketing" },
+              { id: "offers", icon: Tag, label: "Offer" },
               { id: "reviews", icon: Star, label: "Feedback" },
             ].map((item) => (
               <button
@@ -143,7 +145,7 @@ const AdminDashboard = () => {
             <TabsContent value="overview" className="space-y-6 lg:space-y-8 mt-0 outline-none">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
                 {[
-                  { label: "Sales", val: "₹1.4M", icon: TrendingUp, color: "text-green-500", bg: "bg-green-50" },
+                  { label: "Sales", val: `₹${totalSales.toLocaleString()}`, icon: TrendingUp, color: "text-green-500", bg: "bg-green-50" },
                   { label: "Products", val: products.length, icon: Package, color: "text-blue-500", bg: "bg-blue-50" },
                   { label: "Orders", val: orders.length, icon: ShoppingCart, color: "text-orange-500", bg: "bg-orange-50" },
                   { label: "Users", val: customers.length, icon: Users, color: "text-purple-500", bg: "bg-purple-50" },
@@ -183,7 +185,7 @@ const AdminDashboard = () => {
             <TabsContent value="products" className="mt-0 space-y-4 lg:space-y-6 outline-none">
               <div className="flex flex-col sm:flex-row justify-between sm:items-center bg-white p-4 lg:p-6 rounded-2xl lg:rounded-3xl shadow-sm gap-4">
                 <div><h3 className="text-lg lg:text-xl font-black text-[#1a1f36]">Inventory Manager</h3><p className="text-[10px] lg:text-xs font-medium text-[#7a869a]">Manage your stock and listing details</p></div>
-                <Button onClick={() => { setEditingProduct(null); setFormData({}); setShowProductForm(true); }} className="gradient-purple rounded-xl lg:rounded-2xl h-11 lg:h-12 px-6 lg:px-8 font-black uppercase text-[10px] tracking-widest shadow-lg shadow-primary/20">Add Product</Button>
+                <Button onClick={() => { setEditingProduct(null); setFormData({}); setShowProductForm(true); }} className="gradient-dark rounded-xl lg:rounded-2xl h-11 lg:h-12 px-6 lg:px-8 font-black uppercase text-[10px] tracking-widest shadow-lg shadow-slate-900/20 text-white">Add Product</Button>
               </div>
               <Card className="border-none shadow-sm rounded-2xl lg:rounded-3xl overflow-hidden">
                 <div className="overflow-x-auto custom-scrollbar">
@@ -314,6 +316,8 @@ const AdminDashboard = () => {
               </div>
             </TabsContent>
 
+
+
             {/* Reviews Tab Content */}
             <TabsContent value="reviews" className="mt-0 space-y-4 outline-none">
               <div className="grid grid-cols-1 gap-4">
@@ -357,17 +361,37 @@ const AdminDashboard = () => {
           <div className="bg-white w-full max-w-2xl lg:max-w-3xl rounded-3xl lg:rounded-[3rem] shadow-2xl overflow-hidden animate-scale-in flex flex-col my-8 max-h-[90vh]">
             <div className="p-6 lg:p-10 border-b border-[#eaedf3] flex justify-between items-center bg-[#fcfdfe] shrink-0">
               <div>
-                <h3 className="text-xl lg:text-3xl font-black text-[#1a1f36] tracking-tight">{editingProduct ? "Revise Listing" : "Market Entry"}</h3>
+                <h3 className="text-xl lg:text-3xl font-black text-[#1a1f36] tracking-tight">{editingProduct ? "Revise Listing" : "Product Details"}</h3>
                 <p className="text-[#a3acb9] font-medium text-[10px] lg:text-sm italic hidden sm:block">Update specifications for the product catalogue.</p>
               </div>
               <Button variant="ghost" size="icon" onClick={() => setShowProductForm(false)} className="rounded-full h-10 w-10 lg:h-12 lg:w-12 transition-all hover:bg-secondary"><X className="w-5 h-5 lg:w-8 lg:h-8" /></Button>
             </div>
             <form className="p-6 lg:p-10 space-y-6 lg:space-y-8 overflow-y-auto custom-scrollbar flex-1 bg-white">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-8">
-                <div className="space-y-2"><label className="text-[9px] lg:text-[10px] font-black uppercase text-[#7a869a] tracking-widest ml-1">Product Title</label><Input required value={formData.name || ""} onChange={e => setFormData({ ...formData, name: e.target.value })} className="rounded-xl lg:rounded-2xl border-[#eaedf3] h-11 lg:h-14 font-bold text-[#1a1f36] text-sm" placeholder="e.g., iPhone 16 Pro Max" /></div>
-                <div className="space-y-2"><label className="text-[9px] lg:text-[10px] font-black uppercase text-[#7a869a] tracking-widest ml-1">Brand</label><Input required value={formData.brand || ""} onChange={e => setFormData({ ...formData, brand: e.target.value })} className="rounded-xl lg:rounded-2xl border-[#eaedf3] h-11 lg:h-14 font-bold text-[#1a1f36] text-sm" placeholder="e.g., Apple" /></div>
-                <div className="space-y-2"><label className="text-[9px] lg:text-[10px] font-black uppercase text-[#7a869a] tracking-widest ml-1">Sale Price</label><Input required type="number" value={formData.price || ""} onChange={e => setFormData({ ...formData, price: Number(e.target.value) })} className="rounded-xl lg:rounded-2xl border-[#eaedf3] h-11 lg:h-14 font-black text-sm" placeholder="Current Price" /></div>
-                <div className="space-y-2"><label className="text-[9px] lg:text-[10px] font-black uppercase text-[#7a869a] tracking-widest ml-1">Category</label>
+                <div className="space-y-2">
+                  <label className="text-[9px] lg:text-[10px] font-black uppercase text-[#7a869a] tracking-widest ml-1">Product Model</label>
+                  <Input required value={formData.name || ""} onChange={e => setFormData({ ...formData, name: e.target.value })} className="rounded-xl lg:rounded-2xl border-[#eaedf3] h-11 lg:h-14 font-bold text-[#1a1f36] text-sm" placeholder="e.g., iPhone 15 Pro" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[9px] lg:text-[10px] font-black uppercase text-[#7a869a] tracking-widest ml-1">Brand</label>
+                  <select
+                    required
+                    value={formData.brand || ""}
+                    onChange={e => setFormData({ ...formData, brand: e.target.value })}
+                    className="w-full rounded-xl lg:rounded-2xl border-[#eaedf3] h-11 lg:h-14 font-bold text-[#1a1f36] text-sm px-4 bg-white border outline-none focus:ring-2 focus:ring-primary/20"
+                  >
+                    <option value="" disabled>Select Brand</option>
+                    {["Apple", "Samsung", "Xiaomi", "OnePlus", "Google", "Vivo", "Oppo", "Realme", "Motorola", "Nothing", "Infinix", "Tecno", "Honor", "Lava", "HP", "Dell", "Lenovo", "Acer", "Asus", "Microsoft", "MSI", "Other"].map(brand => (
+                      <option key={brand} value={brand}>{brand}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[9px] lg:text-[10px] font-black uppercase text-[#7a869a] tracking-widest ml-1">Sale Price</label>
+                  <Input required type="number" value={formData.price || ""} onChange={e => setFormData({ ...formData, price: Number(e.target.value) })} className="rounded-xl lg:rounded-2xl border-[#eaedf3] h-11 lg:h-14 font-black text-sm" placeholder="Current Price" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[9px] lg:text-[10px] font-black uppercase text-[#7a869a] tracking-widest ml-1">Category</label>
                   <select
                     required
                     value={formData.category || ""}
@@ -381,20 +405,74 @@ const AdminDashboard = () => {
                     <option value="General">General</option>
                   </select>
                 </div>
-                <div className="space-y-2"><label className="text-[9px] lg:text-[10px] font-black uppercase text-[#7a869a] tracking-widest ml-1">Catalog Price</label><Input required type="number" value={formData.originalPrice || ""} onChange={e => setFormData({ ...formData, originalPrice: Number(e.target.value) })} className="rounded-xl lg:rounded-2xl border-[#eaedf3] h-11 lg:h-14 font-bold text-muted-foreground text-sm" placeholder="Was Price" /></div>
+                <div className="space-y-2">
+                  <label className="text-[9px] lg:text-[10px] font-black uppercase text-[#7a869a] tracking-widest ml-1">MRP</label>
+                  <Input required type="number" value={formData.originalPrice || ""} onChange={e => setFormData({ ...formData, originalPrice: Number(e.target.value) })} className="rounded-xl lg:rounded-2xl border-[#eaedf3] h-11 lg:h-14 font-bold text-muted-foreground text-sm" placeholder="Maximum Retail Price" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[9px] lg:text-[10px] font-black uppercase text-[#7a869a] tracking-widest ml-1">Core Specification</label>
+                  <Input
+                    value={formData.specifications?.[0] || ""}
+                    onChange={e => setFormData({ ...formData, specifications: [e.target.value, ...(formData.specifications?.slice(1) || [])] })}
+                    className="rounded-xl lg:rounded-2xl border-[#eaedf3] h-11 lg:h-14 font-bold text-[#1a1f36] text-sm"
+                    placeholder="e.g., A17 Pro Chip, 8GB RAM"
+                  />
+                </div>
+                <div className="space-y-4 md:col-span-2 bg-[#fcfdfe] p-4 lg:p-6 rounded-3xl border border-[#eaedf3]">
+                  <h4 className="text-[10px] font-black uppercase text-[#1a1f36] tracking-widest mb-4 flex items-center gap-2">
+                    <div className="w-1.5 h-4 bg-primary rounded-full" />
+                    Media Assets (4 Images + 1 Video)
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
+                    {[0, 1, 2, 3].map((idx) => (
+                      <div key={idx} className="space-y-2">
+                        <label className="text-[9px] font-black uppercase text-[#7a869a] tracking-widest ml-1">Image Slot {idx + 1}</label>
+                        <Input
+                          value={formData.images?.[idx] || ""}
+                          onChange={e => {
+                            const newImages = [...(formData.images || ["", "", "", ""])];
+                            newImages[idx] = e.target.value;
+                            setFormData({ ...formData, images: newImages });
+                          }}
+                          className="rounded-xl lg:rounded-2xl border-[#eaedf3] h-11 lg:h-12 font-medium text-xs bg-white"
+                          placeholder={`Link to Image ${idx + 1}`}
+                        />
+                      </div>
+                    ))}
+                    <div className="space-y-2 sm:col-span-2">
+                      <label className="text-[9px] font-black uppercase text-primary tracking-widest ml-1 italic underline">Product Video (YouTube/Direct Link)</label>
+                      <Input
+                        value={formData.videoUrl || ""}
+                        onChange={e => setFormData({ ...formData, videoUrl: e.target.value })}
+                        className="rounded-xl lg:rounded-2xl border-primary/30 h-11 lg:h-12 font-bold text-xs bg-[#fdf5ff]"
+                        placeholder="Paste video URL here..."
+                      />
+                    </div>
+                  </div>
+                </div>
                 <div className="space-y-2 md:col-span-2"><label className="text-[9px] lg:text-[10px] font-black uppercase text-[#7a869a] tracking-widest ml-1">Description</label><textarea required rows={4} value={formData.description || ""} onChange={e => setFormData({ ...formData, description: e.target.value })} className="w-full rounded-xl lg:rounded-2xl border-[#eaedf3] p-4 text-xs lg:text-sm font-medium focus:ring-2 focus:ring-primary/20 outline-none hover:border-primary/30 transition-all border shadow-sm" placeholder="Craft a compelling story for this product..." /></div>
               </div>
             </form>
             <div className="p-6 lg:p-10 bg-[#f8f9fc] border-t border-[#eaedf3] flex flex-col sm:flex-row gap-4 lg:gap-6 shrink-0">
-              <Button variant="ghost" onClick={() => setShowProductForm(false)} className="order-2 sm:order-1 flex-1 h-12 lg:h-14 rounded-xl lg:rounded-2xl font-black uppercase text-[10px] tracking-widest">Abandon Draft</Button>
+              <Button variant="ghost" onClick={() => setShowProductForm(false)} className="order-2 sm:order-1 flex-1 h-12 lg:h-14 rounded-xl lg:rounded-2xl font-black uppercase text-[10px] tracking-widest">Cancel</Button>
               <Button onClick={(e) => {
                 e.preventDefault();
                 const id = editingProduct ? editingProduct.id : `p-${Date.now()}`;
-                const pData = { ...formData, id, rating: formData.rating || 4.5, reviewCount: formData.reviewCount || 0, images: [], featured: !!formData.featured, specifications: formData.specifications || [], category: formData.category || "General" } as Product;
+                const pData = {
+                  ...formData,
+                  id,
+                  rating: formData.rating || 4.5,
+                  reviewCount: formData.reviewCount || 0,
+                  images: (formData.images || []).filter(url => url.trim() !== ""),
+                  videoUrl: formData.videoUrl || "",
+                  featured: !!formData.featured,
+                  specifications: formData.specifications || (editingProduct?.specifications || []),
+                  category: formData.category || "General"
+                } as Product;
                 editingProduct ? updateProduct(pData) : addProduct(pData);
                 toast.success(editingProduct ? "Listing updated" : "Product launched successfully!");
                 setShowProductForm(false);
-              }} className="order-1 sm:order-2 flex-1 h-12 lg:h-14 rounded-xl lg:rounded-2xl gradient-purple font-black uppercase text-[10px] tracking-widest shadow-xl shadow-primary/30">Commit Changes</Button>
+              }} className="order-1 sm:order-2 flex-1 h-12 lg:h-14 rounded-xl lg:rounded-2xl gradient-dark font-black uppercase text-[10px] tracking-widest shadow-xl shadow-slate-900/30 text-white">{editingProduct ? "Update Product" : "Add Product"}</Button>
             </div>
           </div>
         </div>

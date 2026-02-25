@@ -106,11 +106,9 @@ const Navbar = () => {
                     <User className="w-4 h-4 text-primary" /> My Profile
                   </Link>
 
-                  {!isAdmin && (
-                    <Link to="/my-orders" className="flex items-center gap-3 px-4 py-2 text-xs text-foreground hover:bg-secondary">
-                      <Package className="w-4 h-4 text-primary" /> My Orders
-                    </Link>
-                  )}
+                  <Link to="/my-orders" className="flex items-center gap-3 px-4 py-2 text-xs text-foreground hover:bg-secondary">
+                    <Package className="w-4 h-4 text-primary" /> My Orders
+                  </Link>
 
                   <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-2 text-xs text-red-500 hover:bg-red-500/10 transition-colors">
                     <LogOut className="w-4 h-4" /> Logout
@@ -132,7 +130,7 @@ const Navbar = () => {
       >
         {/* Backdrop */}
         <div
-          className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-500 ${isMenuOpen ? "opacity-100" : "opacity-0"}`}
+          className={`absolute inset-0 bg-background/40 backdrop-blur-sm transition-opacity duration-500 ${isMenuOpen ? "opacity-100" : "opacity-0"}`}
           onClick={() => setIsMenuOpen(false)}
         />
 
@@ -199,14 +197,12 @@ const Navbar = () => {
                     </div>
                     <span className="font-bold text-sm text-black">{isAdmin ? "Admin Portal" : "My Profile Settings"}</span>
                   </Link>
-                  {!isAdmin && (
-                    <Link to="/my-orders" className="flex items-center gap-4 p-4 rounded-2xl bg-primary/5 hover:bg-primary/10 transition-all border border-primary/5 hover:border-primary/20" onClick={() => setIsMenuOpen(false)}>
-                      <div className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-primary transition-colors">
-                        <Package className="w-4 h-4" />
-                      </div>
-                      <span className="font-bold text-sm text-black">Order Tracking</span>
-                    </Link>
-                  )}
+                  <Link to="/my-orders" className="flex items-center gap-4 p-4 rounded-2xl bg-primary/5 hover:bg-primary/10 transition-all border border-primary/5 hover:border-primary/20" onClick={() => setIsMenuOpen(false)}>
+                    <div className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-primary transition-colors">
+                      <Package className="w-4 h-4" />
+                    </div>
+                    <span className="font-bold text-sm text-black">Order Tracking</span>
+                  </Link>
                   <button onClick={() => { handleLogout(); setIsMenuOpen(false); }} className="w-full flex items-center gap-4 p-4 rounded-xl text-red-500 hover:bg-red-50 transition-all font-bold text-sm">
                     <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center">
                       <LogOut className="w-4 h-4" />

@@ -13,6 +13,7 @@ const productSchema = new mongoose.Schema({
     specifications: [{ type: String }],
     isFeatured: { type: Boolean, default: false },
     isTrending: { type: Boolean, default: false },
+    videoUrl: { type: String },
 }, { timestamps: true });
 
 export default mongoose.model('Product', productSchema);

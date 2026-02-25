@@ -45,7 +45,6 @@ const ProtectedRoute = ({ children, adminOnly = false }: { children: React.React
 
   return <>{children}</>;
 };
-
 const AppContents = () => {
   const location = useLocation();
   const isAdminPath = location.pathname.startsWith("/admin");
