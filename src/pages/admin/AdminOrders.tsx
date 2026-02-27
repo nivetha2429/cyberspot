@@ -3,6 +3,8 @@ import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 import { Settings, ExternalLink, RefreshCw } from "lucide-react";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
 const AdminOrders = () => {
     const [orders, setOrders] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -15,7 +17,7 @@ const AdminOrders = () => {
     const fetchAllOrders = async () => {
         setLoading(true);
         try {
-            const response = await fetch("http://localhost:5000/api/admin/orders", {
+            const response = await fetch(`${API_URL}/admin/orders`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             const data = await response.json();
@@ -33,7 +35,7 @@ const AdminOrders = () => {
 
     const updateStatus = async (orderId: string, newStatus: string) => {
         try {
-            const response = await fetch(`http://localhost:5000/api/admin/orders/${orderId}`, {
+            const response = await fetch(`${API_URL}/admin/orders/${orderId}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -92,8 +94,8 @@ const AdminOrders = () => {
                                     <td className="px-6 py-4 font-bold text-primary">₹{order.totalAmount.toLocaleString()}</td>
                                     <td className="px-6 py-4">
                                         <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase transition-all ${order.status === "Delivered" ? "bg-green-500/10 text-green-500 border border-green-500/20" :
-                                                order.status === "Shipped" ? "bg-primary/10 text-primary border border-primary/20" :
-                                                    "bg-orange-500/10 text-orange-500 border border-orange-500/20"
+                                            order.status === "Shipped" ? "bg-primary/10 text-primary border border-primary/20" :
+                                                "bg-orange-500/10 text-orange-500 border border-orange-500/20"
                                             }`}>
                                             {order.status}
                                         </span>

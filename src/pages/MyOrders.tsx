@@ -3,6 +3,8 @@ import { useAuth } from "@/context/AuthContext";
 import { Package, Truck, Clock, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
 const MyOrders = () => {
     const [orders, setOrders] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -14,7 +16,7 @@ const MyOrders = () => {
 
     const fetchOrders = async () => {
         try {
-            const response = await fetch("http://localhost:5000/api/orders", {
+            const response = await fetch(`${API_URL}/orders`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             const data = await response.json();

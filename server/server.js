@@ -5,6 +5,8 @@ import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { MongoMemoryServer } from 'mongodb-memory-server';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 import Product from './models/Product.js';
 import User from './models/User.js';
@@ -14,8 +16,22 @@ import { authMiddleware, isAdmin } from './middleware/authMiddleware.js';
 
 dotenv.config();
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: [
+        'https://aaro-8w5a.onrender.com',
+        'http://localhost:8080',
+        'http://localhost:3000'
+    ],
+    credentials: true
+}));
+
+// Serve React frontend build
+const distPath = path.join(__dirname, '..', 'dist');
+app.use(express.static(distPath));
 app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
@@ -225,6 +241,11 @@ app.put('/api/admin/orders/:id', authMiddleware, isAdmin, async (req, res) => {
     } catch (error) {
         res.status(400).json({ message: "Failed to update order" });
     }
+});
+
+// Catch-all: serve React app for any non-API route
+app.get('*', (req, res) => {
+    res.sendFile(path.join(distPath, 'index.html'));
 });
 
 app.listen(PORT, '0.0.0.0', () => {

@@ -5,6 +5,8 @@ import { WHATSAPP_NUMBER } from "@/data/products";
 import { MessageCircle, CheckCircle, Package } from "lucide-react";
 import { toast } from "sonner";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
 const OrderForm = () => {
   const { items, totalPrice, clearCart } = useCart();
   const { user, token, isAuthenticated } = useAuth();
@@ -38,7 +40,7 @@ const OrderForm = () => {
 
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:5000/api/orders", {
+      const response = await fetch(`${API_URL}/orders`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

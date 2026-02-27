@@ -1,29 +1,14 @@
 services:
-  # Backend Web Service
   - type: web
-    name: aaro-backend
+    name: aaro
     env: node
-    plan: free # Use free tier
-    rootDir: server
-    buildCommand: npm install
-    startCommand: node server.js
+    plan: free
+    buildCommand: npm install && npm run build && cd server && npm install
+    startCommand: node server/server.js
     envVars:
       - key: NODE_VERSION
         value: 18.0.0
       - key: MONGODB_URI
-        sync: false # Set this in Render Dashboard (Atlas URI)
-
-  # Frontend Static Site
-  - type: web
-    name: aaro-frontend
-    env: static
-    plan: free # Use free tier
-    buildCommand: npm install && npm run build
-    staticPublishPath: dist
-    envVars:
-      - key: VITE_API_URL
-        fromService:
-          type: web
-          name: aaro-backend
-          property: host
-        path: /api # Append /api to the auto-generated host
+        sync: false
+      - key: JWT_SECRET
+        sync: false
