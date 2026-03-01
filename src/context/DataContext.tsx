@@ -43,7 +43,7 @@ interface DataContextType {
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001/api";
 
 const getToken = () => localStorage.getItem("aaro_token");
 
@@ -78,8 +78,8 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         id: p._id || p.id,
         images: Array.isArray(p.images) ? p.images.map(normalizeImageUrl) : p.images,
     });
-    const mapCategory = (c: any): Category => ({ ...c, id: c._id || c.id });
-    const mapBrand = (b: any): Brand => ({ ...b, id: b._id || b.id });
+    const mapCategory = (c: any): Category => ({ ...c, id: c._id || c.id, image: normalizeImageUrl(c.image) });
+    const mapBrand = (b: any): Brand => ({ ...b, id: b._id || b.id, image: normalizeImageUrl(b.image) });
     const mapOffer = (o: any): Offer => ({ ...o, id: o._id || o.id, image: normalizeImageUrl(o.image) });
     const mapReview = (r: any): Review => ({ ...r, id: r._id || r.id });
     const mapModel = (m: any): ProductModel => ({ ...m, id: m._id || m.id });

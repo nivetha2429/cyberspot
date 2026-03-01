@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { Upload, X, Image as ImageIcon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001/api";
 
 interface ImageUploadProps {
     value: string;
@@ -73,7 +73,7 @@ export const ImageUpload = ({ value, onChange, label, className = "" }: ImageUpl
                             src={value}
                             alt="Preview"
                             className="w-full h-40 object-cover rounded-2xl"
-                            onError={e => { (e.target as HTMLImageElement).src = ""; onChange(""); }}
+                            onError={e => { (e.target as HTMLImageElement).src = ""; }}
                         />
                         <button
                             type="button"

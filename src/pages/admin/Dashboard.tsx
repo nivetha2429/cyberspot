@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ImageUpload, MultiImageUpload, VideoUpload } from "@/components/ImageUpload";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001/api";
 
 // ─────────────── SPEC FIELDS CONFIG ───────────────
 const PHONE_SPECS = ["os", "ramSize", "battery", "displaySize", "camera"];
@@ -696,13 +696,13 @@ const AdminDashboard = () => {
                                       {v ? (
                                         (v.stock ?? 0) > 0
                                           ? <span className="inline-flex items-center gap-1 bg-green-50 text-green-600 border border-green-100 text-[10px] font-black px-2 py-1 rounded-lg">
-                                              <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" />
-                                              {v.stock}
-                                            </span>
+                                            <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" />
+                                            {v.stock}
+                                          </span>
                                           : <span className="inline-flex items-center gap-1 bg-red-50 text-red-500 border border-red-100 text-[10px] font-black px-2 py-1 rounded-lg">
-                                              <span className="w-1.5 h-1.5 rounded-full bg-red-400 inline-block" />
-                                              Out of Stock
-                                            </span>
+                                            <span className="w-1.5 h-1.5 rounded-full bg-red-400 inline-block" />
+                                            Out of Stock
+                                          </span>
                                       ) : <span className="text-[#d0d5dd] text-xs">—</span>}
                                     </td>
                                     <td className="px-3 sm:px-5 py-2 text-right">
@@ -1260,11 +1260,10 @@ const AdminDashboard = () => {
                         key={tag || "none"}
                         type="button"
                         onClick={() => setFormData({ ...formData, tag: tag || undefined })}
-                        className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider border transition-all ${
-                          (formData.tag || "") === tag
+                        className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider border transition-all ${(formData.tag || "") === tag
                             ? "bg-primary text-white border-primary shadow-md shadow-primary/20"
                             : "bg-white text-[#7a869a] border-[#eaedf3] hover:border-primary/30 hover:text-primary"
-                        }`}
+                          }`}
                       >
                         {tag || "None"}
                       </button>

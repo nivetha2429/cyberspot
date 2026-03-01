@@ -47,14 +47,22 @@ app.use(express.json({ limit: '10mb' }));
 
 const BRAND_DOMAINS = {
     apple: 'apple.com', samsung: 'samsung.com', oneplus: 'oneplus.com',
-    google: 'google.com', xiaomi: 'xiaomi.com', realme: 'realme.com',
-    oppo: 'oppo.com', vivo: 'vivo.com', nothing: 'nothing.technology',
-    motorola: 'motorola.com', dell: 'dell.com', hp: 'hp.com',
-    lenovo: 'lenovo.com', asus: 'asus.com', microsoft: 'microsoft.com',
+    google: 'google.com', googlepixel: 'google.com', xiaomi: 'mi.com',
+    redmi: 'mi.com', realme: 'realme.com', oppo: 'oppo.com',
+    vivo: 'vivo.com', nothing: 'nothing.technology', motorola: 'motorola.com',
+    dell: 'dell.com', hp: 'hp.com', lenovo: 'lenovo.com',
+    lenova: 'lenovo.com', asus: 'asus.com', microsoft: 'microsoft.com',
     acer: 'acer.com', msi: 'msi.com', razer: 'razer.com',
     nokia: 'nokia.com', sony: 'sony.com', lg: 'lg.com',
-    huawei: 'huawei.com', poco: 'poco.com', iqoo: 'iqoo.com',
+    huawei: 'huawei.com', poco: 'po.co', iqoo: 'iqoo.com',
     tecno: 'tecno-mobile.com', infinix: 'infinixmobility.com',
+    boat: 'boat-lifestyle.com', noise: 'gonoise.com', zebronics: 'zebronics.com',
+    boult: 'boultaudio.com', portronics: 'portronics.com',
+    logitech: 'logitech.com', corsair: 'corsair.com', steelseries: 'steelseries.com',
+    hyperx: 'hyperx.com', creative: 'creative.com', edifier: 'edifier.com',
+    jbl: 'jbl.com', bose: 'bose.com', sennheiser: 'sennheiser.com',
+    marshall: 'marshall.com', canon: 'canon.com', nikon: 'nikon.com',
+    fujifilm: 'fujifilm.com', panasonic: 'panasonic.com', casio: 'casio.com',
 };
 
 async function fetchAndSaveBrandLogo(brandName) {
