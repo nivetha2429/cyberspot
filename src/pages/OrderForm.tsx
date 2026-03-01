@@ -223,7 +223,7 @@ const OrderForm = () => {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {field("City *", "city", "text", "e.g. Chennai")}
               {field("State *", "state", "text", "e.g. Tamil Nadu")}
             </div>

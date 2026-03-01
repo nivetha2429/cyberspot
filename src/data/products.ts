@@ -23,6 +23,7 @@ export interface Product {
   isTrending?: boolean;
   modelId?: string;
   variants?: Variant[];
+  tag?: string;
 }
 
 export interface ProductModel {
@@ -88,6 +89,7 @@ export interface Offer {
   code: string;
   image?: string;
   active: boolean;
+  tag?: string;
 }
 
 export interface Customer {

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ShoppingCart, Menu, X, Search, User, LogOut, LayoutDashboard, Package, ChevronRight, Smartphone, Laptop, Headphones } from "lucide-react";
+import { ShoppingCart, Menu, X, Search, User, LogOut, LayoutDashboard, Package, ChevronRight, Smartphone, Laptop, Home, Tag } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { useData } from "@/context/DataContext";
@@ -39,6 +39,17 @@ const Navbar = () => {
     }
   }, [isMenuOpen, isSearchOpen]);
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setIsMenuOpen(false);
+        setIsSearchOpen(false);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   const handleLogout = () => {
     logout();
     toast.info("Logged out successfully");
@@ -47,13 +58,13 @@ const Navbar = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white/60 backdrop-blur-lg border-b border-primary/10 shadow-sm transition-all duration-500">
-      <div className="container mx-auto px-4 py-3 flex items-center justify-between gap-4">
+      <div className="container mx-auto px-2 sm:px-4 py-3 flex items-center justify-between gap-2 sm:gap-4">
         {/* Logo */}
         <div className="flex items-center gap-2 group shrink-0">
           <img
             src={logo}
             alt="AARO Systems Logo"
-            className="h-14 md:h-20 w-auto object-contain transition-transform group-hover:scale-105"
+            className="h-14 md:h-12 w-auto object-contain transition-transform group-hover:scale-105"
             onError={(e) => {
               e.currentTarget.src = "https://placehold.co/200x60/7c3aed/ffffff?text=AARO+SYSTEMS";
             }}
@@ -69,7 +80,7 @@ const Navbar = () => {
           <Link to="/offers" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Offers</Link>
         </nav>
 
-        <div className="flex-1 max-w-md hidden lg:flex relative">
+        <div className="flex-1 max-w-xs md:max-w-sm lg:max-w-lg hidden md:flex relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground z-10" />
           <input
             type="text"
@@ -77,13 +88,13 @@ const Navbar = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={handleSearch}
             placeholder="Search products..."
-            className="w-full bg-white/80 backdrop-blur-md text-sm border hover:border-primary/20 border-transparent rounded-full py-2 pl-10 pr-4 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all font-medium shadow-sm z-10 relative"
+            className="w-full bg-white/80 backdrop-blur-md text-sm border hover:border-primary/20 border-transparent rounded-full py-2 md:py-2.5 pl-10 pr-4 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all font-medium shadow-sm z-10 relative"
           />
 
           {/* Desktop Search Dropdown */}
           {searchQuery.length > 1 && searchResults.length > 0 && (
             <div className="absolute top-full left-0 right-0 mt-2 bg-white/95 backdrop-blur-xl border border-primary/20 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 z-50">
-              <div className="max-h-80 overflow-y-auto w-full">
+              <div className="max-h-[50vh] overflow-y-auto w-full">
                 {searchResults.map((p) => (
                   <Link
                     key={p.id}
@@ -117,7 +128,7 @@ const Navbar = () => {
 
         {/* Action Buttons */}
         <div className="flex items-center gap-2">
-          <button className="lg:hidden p-2 text-muted-foreground hover:text-primary" onClick={() => setIsSearchOpen(!isSearchOpen)}>
+          <button className="md:hidden p-2 text-muted-foreground hover:text-primary" onClick={() => setIsSearchOpen(!isSearchOpen)}>
             <Search className="w-5 h-5" />
           </button>
 
@@ -178,25 +189,22 @@ const Navbar = () => {
             </div>
           )}
 
-          <button className="md:hidden p-2 text-muted-foreground" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
         </div>
       </div>
 
       {/* Mobile Menu Overlay & Sidebar */}
       <div
-        className={`fixed inset-0 z-[100] transition-all duration-500 lg:hidden ${isMenuOpen ? "visible" : "invisible pointer-events-none"}`}
+        className={`fixed inset-0 z-[100] md:hidden ${isMenuOpen ? "pointer-events-auto" : "pointer-events-none"}`}
       >
         {/* Backdrop */}
         <div
-          className={`absolute inset-0 bg-background/40 backdrop-blur-sm transition-opacity duration-500 ${isMenuOpen ? "opacity-100" : "opacity-0"}`}
+          className={`absolute inset-0 bg-background/40 backdrop-blur-sm transition-opacity duration-500 ${isMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
           onClick={() => setIsMenuOpen(false)}
         />
 
         {/* Sidebar */}
         <div
-          className={`absolute left-0 top-0 bottom-0 w-[85%] max-w-[320px] bg-white/95 backdrop-blur-2xl transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] flex flex-col shadow-[20px_0_60px_-15px_rgba(76,29,149,0.3)] ${isMenuOpen ? "translate-x-0" : "-translate-x-full"}`}
+          className={`absolute left-0 top-0 bottom-0 w-[85%] max-w-[320px] bg-white transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] flex flex-col shadow-[20px_0_60px_-15px_rgba(76,29,149,0.3)] ${isMenuOpen ? "translate-x-0" : "-translate-x-full"}`}
         >
           <div className="p-6 border-b border-primary/10 flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -212,26 +220,27 @@ const Navbar = () => {
 
           <nav className="flex-1 overflow-y-auto p-6 space-y-8">
             <div className="space-y-2">
-              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-2 mb-4">Shop by Category</p>
+              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-2 mb-4">Navigation</p>
               {[
-                { label: "Smartphones", path: "/phones", icon: Smartphone },
-                { label: "Laptops & PCs", path: "/laptops", icon: Laptop },
-                { label: "Brands", path: "/brands", icon: Headphones },
-                { label: "Special Offers", path: "/offers", icon: Search }
+                { label: "Home", path: "/", icon: Home },
+                { label: "Phones", path: "/phones", icon: Smartphone },
+                { label: "Laptops", path: "/laptops", icon: Laptop },
+                { label: "Brands", path: "/brands", icon: Tag },
+                { label: "Offers", path: "/offers", icon: Tag }
               ].map((link) => (
                 <Link
                   key={link.path}
                   to={link.path}
-                  className="flex items-center justify-between p-4 rounded-2xl bg-primary/5 hover:bg-primary/10 transition-all group border border-primary/5 hover:border-primary/20"
+                  className="flex items-center justify-between p-4 rounded-2xl bg-foreground/8 hover:bg-foreground/12 transition-all group border border-foreground/10 hover:border-foreground/20"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                    <div className="w-8 h-8 rounded-lg bg-foreground/10 flex items-center justify-center text-foreground group-hover:bg-primary/20 group-hover:text-primary transition-colors">
                       <link.icon className="w-4 h-4" />
                     </div>
-                    <span className="font-bold text-sm tracking-tight text-black">{link.label}</span>
+                    <span className="font-black text-sm tracking-tight text-primary">{link.label}</span>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground opacity-30 group-hover:opacity-100 transition-all" />
+                  <ChevronRight className="w-4 h-4 text-foreground/40 group-hover:text-primary group-hover:opacity-100 transition-all" />
                 </Link>
               ))}
             </div>
@@ -251,17 +260,17 @@ const Navbar = () => {
                       <p className="text-[10px] font-bold text-muted-foreground uppercase">{user?.role}</p>
                     </div>
                   </div>
-                  <Link to={isAdmin ? "/admin/dashboard" : "/profile"} className="flex items-center gap-4 p-4 rounded-2xl bg-primary/5 hover:bg-primary/10 transition-all border border-primary/5 hover:border-primary/20" onClick={() => setIsMenuOpen(false)}>
+                  <Link to={isAdmin ? "/admin/dashboard" : "/profile"} className="flex items-center gap-4 p-4 rounded-2xl bg-foreground/8 hover:bg-foreground/12 transition-all border border-foreground/10 hover:border-foreground/20" onClick={() => setIsMenuOpen(false)}>
                     <div className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-primary transition-colors">
                       {isAdmin ? <LayoutDashboard className="w-4 h-4" /> : <User className="w-4 h-4" />}
                     </div>
-                    <span className="font-bold text-sm text-black">{isAdmin ? "Admin Portal" : "My Profile Settings"}</span>
+                    <span className="font-bold text-sm text-primary">{isAdmin ? "Admin Portal" : "My Profile Settings"}</span>
                   </Link>
-                  <Link to="/my-orders" className="flex items-center gap-4 p-4 rounded-2xl bg-primary/5 hover:bg-primary/10 transition-all border border-primary/5 hover:border-primary/20" onClick={() => setIsMenuOpen(false)}>
+                  <Link to="/my-orders" className="flex items-center gap-4 p-4 rounded-2xl bg-foreground/8 hover:bg-foreground/12 transition-all border border-foreground/10 hover:border-foreground/20" onClick={() => setIsMenuOpen(false)}>
                     <div className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-primary transition-colors">
                       <Package className="w-4 h-4" />
                     </div>
-                    <span className="font-bold text-sm text-black">Order Tracking</span>
+                    <span className="font-bold text-sm text-primary">Order Tracking</span>
                   </Link>
                   <button onClick={() => { handleLogout(); setIsMenuOpen(false); }} className="w-full flex items-center gap-4 p-4 rounded-xl text-red-500 hover:bg-red-50 transition-all font-bold text-sm">
                     <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center">
@@ -287,7 +296,7 @@ const Navbar = () => {
 
       {/* Mobile Search Overlay */}
       <div
-        className={`fixed inset-0 z-[110] bg-white/80 backdrop-blur-2xl transition-all duration-300 lg:hidden ${isSearchOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"}`}
+        className={`fixed inset-0 z-[110] bg-white/80 backdrop-blur-2xl transition-all duration-300 md:hidden ${isSearchOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"}`}
       >
         <div className="p-6 flex flex-col h-full">
           <div className="flex items-center justify-between mb-8">

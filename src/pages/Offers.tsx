@@ -7,7 +7,7 @@ const Offers = () => {
   const { offers } = useData();
 
   return (
-    <div className="min-h-screen bg-animated">
+    <div className="min-h-screen bg-animated pb-24 md:pb-0">
       {/* Hero Section */}
       <section className="relative h-[300px] md:h-[400px] overflow-hidden rounded-b-[3rem] shadow-2xl">
         <img
@@ -21,10 +21,10 @@ const Offers = () => {
               <Sparkles className="w-4 h-4" />
               <span className="text-xs font-bold uppercase tracking-wider">Exclusive Deals</span>
             </div>
-            <h1 className="text-4xl md:text-6xl font-black text-white mb-4 text-glow">
+            <h1 className="text-2xl sm:text-4xl md:text-6xl font-black text-white mb-4 text-glow">
               Summer <span className="text-primary italic">Spectacular</span>
             </h1>
-            <p className="text-lg text-white/80 mb-8 max-w-sm">
+            <p className="text-sm sm:text-lg text-white/80 mb-8 max-w-sm">
               Grab the hottest tech at the coolest prices. Limited time offers on your favorite brands.
             </p>
           </div>
@@ -33,16 +33,16 @@ const Offers = () => {
 
       {/* Offers Grid */}
       <div className="container mx-auto px-4 -mt-10 mb-16 relative z-10">
-        <div className="grid md:grid-cols-2 gap-6 md:gap-8">
+        <div className="grid lg:grid-cols-2 gap-6 lg:gap-8">
           {offers.map((offer) => (
             <div
               key={offer.id}
               className={`group rounded-[2rem] overflow-hidden transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl ${offer.active
-                ? "glass-card border-2 border-primary/20 p-8"
-                : "bg-background/40 backdrop-blur-sm grayscale opacity-70 p-8"
+                ? "glass-card border-2 border-primary/20 p-4 lg:p-8"
+                : "bg-background/40 backdrop-blur-sm grayscale opacity-70 p-4 lg:p-8"
                 }`}
             >
-              <div className="flex flex-col md:flex-row gap-6">
+              <div className="flex flex-col lg:flex-row gap-6">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-4">
                     <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg ${offer.active ? "gradient-offer animate-pulse" : "bg-muted text-muted-foreground"
@@ -63,7 +63,7 @@ const Offers = () => {
                   </p>
 
                   <div className="flex items-baseline gap-2 mb-8">
-                    <span className="text-5xl font-black text-gradient-offer tracking-tighter">{offer.discount}%</span>
+                    <span className="text-4xl md:text-5xl font-black text-gradient-offer tracking-tighter">{offer.discount}%</span>
                     <span className="text-lg font-bold text-muted-foreground uppercase tracking-widest">Off</span>
                   </div>
 
@@ -100,7 +100,7 @@ const Offers = () => {
         </div>
 
         {/* Trust Badges */}
-        <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-4 px-4">
+        <div className="mt-20 grid grid-cols-2 lg:grid-cols-4 gap-4 px-4">
           {[
             { label: "Original Products", sub: "100% Genuine" },
             { label: "Free Shipping", sub: "On all orders" },

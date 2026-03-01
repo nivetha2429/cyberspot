@@ -3,30 +3,8 @@ import { Link } from "react-router-dom";
 import { Smartphone, Laptop, ArrowUpRight, Package } from "lucide-react";
 import { useData } from "@/context/DataContext";
 
-const BRAND_COLORS: Record<string, string> = {
-  Apple: "from-slate-700 to-slate-900",
-  Samsung: "from-blue-600 to-blue-900",
-  OnePlus: "from-red-500 to-red-800",
-  Google: "from-green-500 to-blue-600",
-  Xiaomi: "from-orange-500 to-orange-800",
-  Nothing: "from-zinc-700 to-zinc-900",
-  Vivo: "from-indigo-500 to-indigo-800",
-  OPPO: "from-teal-500 to-teal-800",
-  Realme: "from-yellow-500 to-orange-600",
-  Motorola: "from-sky-500 to-sky-800",
-  Dell: "from-blue-500 to-blue-800",
-  HP: "from-cyan-600 to-blue-700",
-  Lenovo: "from-red-600 to-red-900",
-  ASUS: "from-blue-700 to-indigo-900",
-  Microsoft: "from-sky-400 to-blue-700",
-  Acer: "from-green-600 to-green-900",
-  MSI: "from-red-700 to-gray-900",
-  Razer: "from-green-400 to-green-800",
-  default: "from-primary to-accent",
-};
-
 const Brands = () => {
-  const { products, loading } = useData();
+  const { products, brands: brandsData, loading } = useData();
 
   const brandMap = useMemo(() => {
     const map: Record<string, { count: number; categories: Set<string>; topProduct?: string }> = {};
@@ -38,16 +16,19 @@ const Brands = () => {
       if (!map[p.brand].topProduct) map[p.brand].topProduct = p.name;
     });
     return Object.entries(map)
-      .map(([name, data]) => ({
-        name,
-        count: data.count,
-        categories: Array.from(data.categories),
-        topProduct: data.topProduct,
-        gradient: BRAND_COLORS[name] || BRAND_COLORS.default,
-        initial: name.charAt(0).toUpperCase(),
-      }))
+      .map(([name, data]) => {
+        const brandEntry = brandsData.find(b => b.name.toLowerCase() === name.toLowerCase());
+        return {
+          name,
+          count: data.count,
+          categories: Array.from(data.categories),
+          topProduct: data.topProduct,
+          image: brandEntry?.image || "",
+          initial: name.charAt(0).toUpperCase(),
+        };
+      })
       .sort((a, b) => b.count - a.count);
-  }, [products]);
+  }, [products, brandsData]);
 
   const phoneBrands = brandMap.filter((b) => b.categories.includes("phone"));
   const laptopBrands = brandMap.filter((b) => b.categories.includes("laptop"));
@@ -77,31 +58,36 @@ const Brands = () => {
           <Link
             key={brand.name}
             to={`/shop?brand=${encodeURIComponent(brand.name)}`}
-            className="group relative overflow-hidden rounded-2xl border border-white/20 shadow-lg hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1.5 transition-all duration-300"
+            className="group relative overflow-hidden rounded-2xl bg-white border border-border shadow-sm hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1.5 transition-all duration-300"
           >
-            {/* Gradient Background */}
-            <div className={`absolute inset-0 bg-gradient-to-br ${brand.gradient} opacity-90`} />
-
-            {/* Shine effect */}
-            <div className="absolute inset-0 bg-gradient-to-br from-white/15 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            {/* Hover tint */}
+            <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
 
             <div className="relative z-10 p-5 flex flex-col items-center text-center gap-3">
-              {/* Brand Initial Logo */}
-              <div className="w-14 h-14 rounded-2xl bg-white/15 backdrop-blur-sm border border-white/25 flex items-center justify-center shadow-inner">
-                <span className="text-2xl font-black text-white tracking-tight">{brand.initial}</span>
+              {/* Brand Logo or Initial */}
+              <div className="w-16 h-16 rounded-2xl bg-secondary/40 border border-border flex items-center justify-center overflow-hidden">
+                {brand.image ? (
+                  <img
+                    src={brand.image}
+                    alt={brand.name}
+                    className="w-12 h-12 object-contain grayscale group-hover:grayscale-0 transition-all duration-300"
+                  />
+                ) : (
+                  <span className="text-2xl font-black text-foreground/40 tracking-tight">{brand.initial}</span>
+                )}
               </div>
 
               {/* Brand Name */}
               <div>
-                <p className="font-black text-white text-sm leading-tight">{brand.name}</p>
-                <p className="text-white/70 text-[10px] font-bold mt-0.5">
+                <p className="font-black text-foreground text-sm leading-tight group-hover:text-primary transition-colors">{brand.name}</p>
+                <p className="text-muted-foreground text-[10px] font-bold mt-0.5">
                   {brand.count} {brand.count === 1 ? "model" : "models"}
                 </p>
               </div>
 
               {/* Explore arrow */}
-              <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:scale-110">
-                <ArrowUpRight className="w-3.5 h-3.5 text-white" />
+              <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:scale-110">
+                <ArrowUpRight className="w-3.5 h-3.5 text-primary" />
               </div>
             </div>
           </Link>

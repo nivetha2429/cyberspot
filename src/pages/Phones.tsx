@@ -27,14 +27,14 @@ const Phones = () => {
   }, [allPhones, search, selectedBrands]);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10 border-b border-primary/10 pb-6">
+    <div className="container mx-auto px-4 py-8 pb-24 md:pb-8">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-10 border-b border-primary/10 pb-6">
         <div>
           <h1 className="text-glow mb-1">Smartphones</h1>
           <p className="text-xs text-muted-foreground font-medium uppercase tracking-widest opacity-70">Next-Gen Mobile Devices</p>
         </div>
 
-        <div className="flex items-center gap-2 w-full md:max-w-md h-12">
+        <div className="flex items-center gap-2 w-full lg:max-w-md h-12">
           <div className="relative flex-1 h-full">
             <input
               type="text"
@@ -57,9 +57,9 @@ const Phones = () => {
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Brand Filter Sidebar */}
         <aside className={`${showFilters ? "block" : "hidden"} lg:block w-full lg:w-64 shrink-0`}>
-          <div className="glass-card rounded-[2rem] p-6 sticky top-24 border border-white/40 shadow-xl shadow-primary/5">
+          <div className="glass-card rounded-[2rem] p-6 lg:sticky lg:top-24 border border-white/40 shadow-xl shadow-primary/5">
             <h3 className="text-xs font-black uppercase tracking-widest text-foreground border-b border-primary/10 pb-3 mb-6">Filter by Brand</h3>
-            <div className="grid grid-cols-2 lg:grid-cols-1 gap-3">
+            <div className="grid grid-cols-1 gap-3">
               {brands.map((brand) => (
                 <label key={brand} className="flex items-center gap-3 text-sm cursor-pointer group">
                   <div className={`w-5 h-5 rounded-md border-2 transition-all flex items-center justify-center ${selectedBrands.includes(brand) ? "bg-primary border-primary" : "border-border group-hover:border-primary/50"}`}>
@@ -89,17 +89,17 @@ const Phones = () => {
         {/* Product Grid */}
         <div className="flex-1 w-full">
           {filteredPhones.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
               {filteredPhones.map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}
             </div>
           ) : (
-            <div className="py-24 glass-card rounded-[2.5rem] flex flex-col items-center justify-center text-center px-10 border border-dashed border-primary/20 bg-primary/5">
-              <div className="w-20 h-20 bg-background/50 rounded-full flex items-center justify-center mb-6 shadow-inner">
-                <Smartphone className="w-10 h-10 text-muted-foreground/50" />
+            <div className="py-12 md:py-24 glass-card rounded-[2.5rem] flex flex-col items-center justify-center text-center px-6 sm:px-10 border border-dashed border-primary/20 bg-primary/5">
+              <div className="w-14 h-14 sm:w-20 sm:h-20 bg-background/50 rounded-full flex items-center justify-center mb-4 sm:mb-6 shadow-inner">
+                <Smartphone className="w-7 h-7 sm:w-10 sm:h-10 text-muted-foreground/50" />
               </div>
-              <h2 className="text-2xl font-black text-foreground mb-2">No Phones Found</h2>
+              <h2 className="text-xl sm:text-2xl font-black text-foreground mb-2">No Phones Found</h2>
               <p className="text-muted-foreground max-w-xs mb-8">We couldn't find any products matching your specific filters.</p>
               <button
                 onClick={() => { setSearch(""); setSelectedBrands([]); }}

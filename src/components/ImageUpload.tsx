@@ -23,7 +23,7 @@ export const ImageUpload = ({ value, onChange, label, className = "" }: ImageUpl
         try {
             const formData = new FormData();
             formData.append("image", file);
-            const token = sessionStorage.getItem("aaro_token");
+            const token = localStorage.getItem("aaro_token");
             const res = await fetch(`${API_URL}/upload`, {
                 method: "POST",
                 headers: { Authorization: `Bearer ${token}` },
@@ -154,7 +154,7 @@ export const VideoUpload = ({ value, onChange, label, className = "" }: ImageUpl
         try {
             const formData = new FormData();
             formData.append("image", file); // Reusing the same multer field
-            const token = sessionStorage.getItem("aaro_token");
+            const token = localStorage.getItem("aaro_token");
             const res = await fetch(`${API_URL}/upload`, {
                 method: "POST",
                 headers: { Authorization: `Bearer ${token}` },

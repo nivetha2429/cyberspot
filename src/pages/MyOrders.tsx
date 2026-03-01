@@ -46,7 +46,7 @@ const MyOrders = () => {
 
     return (
         <div className="container mx-auto px-4 py-8 pb-24 md:pb-8 max-w-4xl animate-fade-in">
-            <h1 className="text-3xl font-bold mb-8 text-foreground">My Orders</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold mb-8 text-foreground">My Orders</h1>
 
             {orders.length === 0 ? (
                 <div className="bg-card border border-border rounded-2xl p-12 text-center">
@@ -58,7 +58,7 @@ const MyOrders = () => {
                 <div className="space-y-6">
                     {orders.map((order) => (
                         <div key={order._id} className="bg-card border border-border rounded-2xl overflow-hidden shadow-soft hover:shadow-lg transition-shadow">
-                            <div className="p-6 bg-secondary/30 flex flex-wrap justify-between items-center gap-4">
+                            <div className="p-4 sm:p-6 bg-secondary/30 flex flex-wrap justify-between items-center gap-3">
                                 <div>
                                     <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider mb-1">Order ID</p>
                                     <p className="text-sm font-mono text-foreground">#{order._id.slice(-8).toUpperCase()}</p>

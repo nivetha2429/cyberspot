@@ -55,12 +55,17 @@ const ProductCard = ({ product }: { product: Product }) => {
               className="w-full h-full object-contain p-4 drop-shadow-2xl"
             />
           ) : (
-            <div className="text-6xl md:text-8xl drop-shadow-xl transform transition-all group-hover:rotate-6">
+            <div className="text-5xl sm:text-6xl md:text-8xl drop-shadow-xl transform transition-all group-hover:rotate-6">
               {product.category === "phone" ? "📱" : "💻"}
             </div>
           )}
         </div>
 
+        {product.tag && (
+          <div className="absolute top-3 left-3 bg-primary text-white text-[9px] font-black px-2.5 py-1 rounded-full shadow-lg tracking-wider uppercase">
+            {product.tag}
+          </div>
+        )}
         {discount > 0 && (
           <div className="absolute top-3 right-3 gradient-offer text-white text-[10px] font-black px-3 py-1.5 rounded-full shadow-lg backdrop-blur-md">
             -{discount}%
@@ -70,7 +75,7 @@ const ProductCard = ({ product }: { product: Product }) => {
 
       <div className="flex-1 flex flex-col px-1">
         <div className="mb-1.5">
-          <p className="text-[9px] font-black text-primary uppercase tracking-widest mb-0.5">{product.brand}</p>
+          <p className="text-[10px] font-black text-primary uppercase tracking-widest mb-0.5">{product.brand}</p>
           <Link to={`/product/${product.id}`}>
             <h3 className="font-black text-foreground text-sm leading-tight hover:text-primary transition-colors line-clamp-2">{product.name}</h3>
           </Link>

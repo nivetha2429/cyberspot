@@ -67,11 +67,11 @@ const Profile = () => {
     ];
 
     return (
-        <div className="container mx-auto px-4 py-12 max-w-4xl animate-fade-in text-black">
-            <div className="flex flex-col md:flex-row gap-8">
+        <div className="container mx-auto px-4 py-12 pb-24 md:pb-12 max-w-4xl animate-fade-in text-black">
+            <div className="flex flex-col lg:flex-row gap-8">
                 {/* Sidebar/Welcome */}
-                <div className="md:w-1/3 text-center md:text-left">
-                    <div className="w-24 h-24 rounded-2xl gradient-purple mx-auto md:mx-0 flex items-center justify-center mb-6 shadow-xl shadow-primary/20 transition-transform hover:scale-105">
+                <div className="lg:w-1/3 text-center lg:text-left">
+                    <div className="w-24 h-24 rounded-2xl gradient-purple mx-auto lg:mx-0 flex items-center justify-center mb-6 shadow-xl shadow-primary/20 transition-transform hover:scale-105">
                         <span className="text-3xl font-bold text-primary-foreground">
                             {user.name.charAt(0).toUpperCase()}
                         </span>

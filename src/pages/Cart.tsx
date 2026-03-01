@@ -28,7 +28,7 @@ const Cart = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 pb-24 md:pb-8">
-      <h1 className="text-3xl md:text-5xl font-black text-foreground mb-8 tracking-tight">Your Cart <span className="text-primary/50 text-xl font-bold">({totalItems} items)</span></h1>
+      <h1 className="text-2xl sm:text-3xl md:text-5xl font-black text-foreground mb-8 tracking-tight">Your Cart <span className="text-primary/50 text-base sm:text-xl font-bold">({totalItems} items)</span></h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         <div className="lg:col-span-2 space-y-4">
@@ -41,7 +41,7 @@ const Cart = () => {
               <div className="flex-1 w-full text-center sm:text-left">
                 <div className="flex items-center justify-center sm:justify-start gap-2 mb-1">
                   <span className="text-[10px] font-black uppercase tracking-widest text-primary bg-primary/10 px-2 py-0.5 rounded-full">{item.product.brand}</span>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-[#7a869a] bg-gray-100 px-2 py-0.5 rounded-full">{item.ram} / {item.storage} / {item.color}</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-[#7a869a] bg-gray-100 px-2 py-0.5 rounded-full max-w-[140px] sm:max-w-none truncate">{item.ram} / {item.storage} / {item.color}</span>
                 </div>
                 <Link to={`/product/${item.product.id}`} className="font-black text-lg md:text-xl text-foreground hover:text-primary transition-colors block mb-1">{item.product.name}</Link>
                 <div className="mb-4">
@@ -72,8 +72,8 @@ const Cart = () => {
         </div>
 
         {/* Summary - Premium Card */}
-        <div className="glass-card rounded-[2.5rem] p-8 md:p-10 h-fit sticky top-24 border border-white/60 shadow-2xl shadow-primary/10">
-          <h3 className="text-2xl font-black text-foreground mb-6 tracking-tight">Order Summary</h3>
+        <div className="glass-card rounded-[2.5rem] p-6 lg:p-10 h-fit lg:sticky lg:top-24 border border-white/60 shadow-2xl shadow-primary/10">
+          <h3 className="text-xl md:text-2xl font-black text-foreground mb-6 tracking-tight">Order Summary</h3>
           <div className="space-y-4 mb-8">
             <div className="flex justify-between text-muted-foreground font-bold">
               <span className="text-sm uppercase tracking-widest">Subtotal</span>
@@ -85,7 +85,7 @@ const Cart = () => {
             </div>
             <div className="pt-6 border-t border-primary/10 flex justify-between items-center">
               <span className="text-sm font-black uppercase tracking-[0.2em] text-muted-foreground">Total</span>
-              <span className="text-4xl font-black text-primary tracking-tighter">₹{totalPrice.toLocaleString()}</span>
+              <span className="text-3xl md:text-4xl font-black text-primary tracking-tighter">₹{totalPrice.toLocaleString()}</span>
             </div>
           </div>
 

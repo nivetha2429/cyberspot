@@ -60,7 +60,7 @@ const Shop = () => {
 
   return (
     <div className="container mx-auto px-4 py-6 pb-24 md:pb-6">
-      <h1 className="text-3xl font-bold text-foreground mb-6">Shop</h1>
+      <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-6">Shop</h1>
 
       {/* Search & Sort Bar */}
       <div className="flex flex-col sm:flex-row gap-4 mb-8">
@@ -124,7 +124,7 @@ const Shop = () => {
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Sidebar Filters */}
         <aside className={`${showFilters ? "block" : "hidden"} lg:block w-full lg:w-64 shrink-0`}>
-          <div className="glass-card rounded-2xl p-6 space-y-8 sticky top-24 border border-white/40 shadow-xl shadow-primary/5">
+          <div className="glass-card rounded-2xl p-6 space-y-8 lg:sticky lg:top-24 border border-white/40 shadow-xl shadow-primary/5">
             <div>
               <h3 className="font-black text-foreground text-xs uppercase tracking-widest mb-4 border-b border-primary/10 pb-2">Category</h3>
               <div className="space-y-3">
@@ -142,7 +142,7 @@ const Shop = () => {
 
             <div>
               <h3 className="font-black text-foreground text-xs uppercase tracking-widest mb-4 border-b border-primary/10 pb-2">Brands</h3>
-              <div className="grid grid-cols-2 lg:grid-cols-1 gap-3">
+              <div className="grid grid-cols-1 gap-3">
                 {brands.map((b) => (
                   <label key={b} className="flex items-center gap-3 text-sm cursor-pointer group">
                     <div className={`w-5 h-5 rounded-md border-2 transition-all flex items-center justify-center ${selectedBrands.includes(b) ? "bg-primary border-primary" : "border-border group-hover:border-primary/50"}`}>
@@ -160,15 +160,15 @@ const Shop = () => {
         {/* Product Grid */}
         <div className="flex-1 w-full">
           {filtered.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
               {filtered.map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}
             </div>
           ) : (
-            <div className="bg-card/50 backdrop-blur-sm rounded-3xl p-20 text-center border border-dashed border-border">
-              <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-                <Search className="w-8 h-8 text-muted-foreground" />
+            <div className="bg-card/50 backdrop-blur-sm rounded-3xl p-8 md:p-20 text-center border border-dashed border-border">
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                <Search className="w-6 h-6 md:w-8 md:h-8 text-muted-foreground" />
               </div>
               <h3 className="text-xl font-bold text-foreground mb-1">No products found</h3>
               <p className="text-muted-foreground">Try adjusting your filters or search terms.</p>

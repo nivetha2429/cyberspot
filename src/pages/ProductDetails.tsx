@@ -212,15 +212,15 @@ const ProductDetails = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-6 max-w-7xl pb-40 md:pb-8">
+    <div className="container mx-auto px-4 py-6 max-w-7xl pb-40 lg:pb-8">
       <Link to="/shop" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary mb-6 transition-colors">
         <ArrowLeft className="w-4 h-4" /> Back to Shop
       </Link>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-start">
         {/* ── Image Gallery ── */}
         <div className="space-y-4 animate-fade-in lg:sticky lg:top-24">
-          <div className="glass-card rounded-[2.5rem] p-8 md:p-12 aspect-square flex items-center justify-center relative overflow-hidden group border border-white/50 shadow-2xl bg-white/40">
+          <div className="glass-card rounded-[2.5rem] p-4 sm:p-8 md:p-12 aspect-square flex items-center justify-center relative overflow-hidden group border border-white/50 shadow-2xl bg-white/40">
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent" />
             {hasImages ? (
               <img src={selectedImage || product.images[0]} alt={product.name}
@@ -238,7 +238,7 @@ const ProductDetails = () => {
           </div>
 
           {hasImages && product.images.length > 1 && (
-            <div className="grid grid-cols-4 gap-3">
+            <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
               {product.images.map((img, i) => (
                 <button key={i} onClick={() => setSelectedImage(img)}
                   className={`aspect-square rounded-2xl overflow-hidden transition-all duration-300 border-2 ${selectedImage === img ? "border-primary shadow-lg scale-95" : "border-white/50 grayscale hover:grayscale-0 hover:border-primary/50"}`}>
@@ -256,7 +256,7 @@ const ProductDetails = () => {
             <span className="text-[10px] font-black uppercase tracking-wider">{product.brand} · {product.category === "phone" ? "Smartphone" : "Laptop"}</span>
           </div>
 
-          <h1 className="text-3xl md:text-5xl font-black bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-4 leading-tight tracking-tight drop-shadow-sm">
+          <h1 className="text-2xl sm:text-3xl md:text-5xl font-black bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-4 leading-tight tracking-tight drop-shadow-sm">
             {product.name}
           </h1>
 
@@ -272,9 +272,9 @@ const ProductDetails = () => {
           </div>
 
           <div className="flex items-baseline gap-4 mb-2 animate-fade-in" key={currentPrice}>
-            <span className="text-4xl md:text-5xl font-black text-primary tracking-tighter">₹{currentPrice.toLocaleString()}</span>
+            <span className="text-3xl sm:text-4xl md:text-5xl font-black text-primary tracking-tighter">₹{currentPrice.toLocaleString()}</span>
             {currentMRP > currentPrice && (
-              <span className="text-xl text-muted-foreground line-through opacity-50">₹{currentMRP.toLocaleString()}</span>
+              <span className="text-base sm:text-xl text-muted-foreground line-through opacity-50">₹{currentMRP.toLocaleString()}</span>
             )}
           </div>
 
@@ -290,7 +290,7 @@ const ProductDetails = () => {
           </div>
 
           {/* Amazon-style Variant Selection */}
-          <div className="space-y-6 mb-8 bg-zinc-50/50 p-6 rounded-[2rem] border border-border">
+          <div className="space-y-6 mb-8 bg-zinc-50/50 p-3 sm:p-6 rounded-[2rem] border border-border">
             {/* RAM Options */}
             <div className="space-y-3">
               <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest ml-1">Select RAM</label>
@@ -299,7 +299,7 @@ const ProductDetails = () => {
                   <button
                     key={ram}
                     onClick={() => setSelectedRAM(ram)}
-                    className={`px-6 py-2.5 rounded-full text-xs font-black transition-all duration-300 border-2 ${selectedRAM === ram
+                    className={`px-3 md:px-6 py-2.5 rounded-full text-xs font-black transition-all duration-300 border-2 ${selectedRAM === ram
                       ? "border-primary text-primary bg-primary/5 shadow-md shadow-primary/10 scale-105"
                       : "bg-white border-transparent text-foreground hover:border-primary/30"
                       }`}
@@ -321,7 +321,7 @@ const ProductDetails = () => {
                       key={storage}
                       disabled={isLowStock}
                       onClick={() => setSelectedStorage(storage)}
-                      className={`px-6 py-2.5 rounded-full text-xs font-black transition-all duration-300 border-2 ${selectedStorage === storage
+                      className={`px-3 md:px-6 py-2.5 rounded-full text-xs font-black transition-all duration-300 border-2 ${selectedStorage === storage
                         ? "border-primary text-primary bg-primary/5 shadow-md shadow-primary/10 scale-105"
                         : isLowStock
                           ? "bg-gray-100 text-gray-400 border-transparent cursor-not-allowed line-through"
@@ -346,7 +346,7 @@ const ProductDetails = () => {
                       key={color}
                       disabled={isLowStock}
                       onClick={() => setSelectedColor(color)}
-                      className={`px-6 py-2.5 rounded-full text-xs font-black transition-all duration-300 border-2 ${selectedColor === color
+                      className={`px-3 md:px-6 py-2.5 rounded-full text-xs font-black transition-all duration-300 border-2 ${selectedColor === color
                         ? "border-primary text-primary bg-primary/5 shadow-md shadow-primary/10 scale-105"
                         : isLowStock
                           ? "bg-gray-100 text-gray-400 border-transparent cursor-not-allowed line-through"
@@ -388,7 +388,7 @@ const ProductDetails = () => {
               <div className="divide-y divide-border/30">
                 {specEntries.map(([key, val]) => (
                   <div key={key} className="flex items-center px-6 py-3 hover:bg-secondary/20 transition-colors">
-                    <span className="text-xs font-black uppercase tracking-wider text-muted-foreground w-28 shrink-0">
+                    <span className="text-xs font-black uppercase tracking-wider text-muted-foreground w-20 md:w-28 shrink-0">
                       {SPEC_LABELS[key] || key}
                     </span>
                     <span className="text-sm font-bold text-foreground">{val}</span>
@@ -398,8 +398,8 @@ const ProductDetails = () => {
             </div>
           )}
 
-          {/* Action Buttons — fixed above MobileNav on mobile (bottom-16), normal flow on md+ */}
-          <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mb-8 fixed md:relative bottom-16 md:bottom-auto left-0 right-0 p-4 md:p-0 bg-white/90 md:bg-transparent backdrop-blur-xl md:backdrop-blur-none border-t border-primary/10 md:border-none z-40 shadow-[0_-10px_40px_-15px_rgba(76,29,149,0.15)] md:shadow-none">
+          {/* Action Buttons — fixed above MobileNav on mobile (bottom-16), normal flow on xl+ */}
+          <div className="flex flex-col sm:flex-row gap-3 lg:gap-4 mb-8 fixed lg:relative bottom-20 lg:bottom-auto left-0 right-0 p-4 lg:p-0 bg-white/90 lg:bg-transparent backdrop-blur-xl lg:backdrop-blur-none border-t border-primary/10 lg:border-none z-40 shadow-[0_-10px_40px_-15px_rgba(76,29,149,0.15)] lg:shadow-none">
             <button onClick={handleAddToCart}
               className={`flex-1 py-4 md:py-5 rounded-full font-black transition-all duration-300 flex items-center justify-center gap-2 md:gap-3 text-sm md:text-lg shadow-xl shadow-primary/10 ${isAdded ? "bg-green-500 text-white shadow-green-500/20" : isAdmin ? "bg-gray-400 text-white cursor-not-allowed" : "bg-gradient-to-r from-primary to-accent text-white hover:opacity-90 hover:shadow-2xl hover:shadow-primary/30 hover:-translate-y-1 active:scale-[0.98]"}`}
               disabled={isAdded || isAdmin}>
@@ -446,7 +446,7 @@ const ProductDetails = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Review Form */}
-          <div className="lg:col-span-1">
+          <div className="md:col-span-1">
             <div className="glass-card rounded-3xl p-6 border border-white/40">
               <h3 className="font-black text-sm uppercase tracking-widest mb-4">Write a Review</h3>
               {user ? (
@@ -486,7 +486,7 @@ const ProductDetails = () => {
           </div>
 
           {/* Review List */}
-          <div className="lg:col-span-2 space-y-4">
+          <div className="md:col-span-2 space-y-4">
             {reviews.length === 0 ? (
               <div className="text-center py-12 text-muted-foreground">No reviews yet. Be the first!</div>
             ) : (

@@ -43,7 +43,7 @@ const Register = () => {
     };
 
     return (
-        <div className="min-h-[70vh] flex items-center justify-center px-4 py-12 animate-fade-in">
+        <div className="min-h-[70vh] flex items-center justify-center px-4 py-12 pb-24 md:pb-12 animate-fade-in">
             <div className="bg-card rounded-2xl p-8 shadow-soft w-full max-w-sm border border-border">
                 <div className="w-14 h-14 rounded-xl gradient-dark mx-auto flex items-center justify-center mb-6 shadow-lg shadow-slate-900/20">
                     <UserPlus className="w-7 h-7 text-white" />

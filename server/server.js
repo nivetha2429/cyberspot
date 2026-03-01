@@ -32,13 +32,60 @@ app.use(cors({
         'https://aaro-8w5a.onrender.com',
         'http://localhost:8000',
         'http://localhost:8080',
-        'http://localhost:3000'
+        'http://localhost:3000',
+        'http://localhost:5173'
     ],
     credentials: true
 }));
 
 // Parse JSON first
 app.use(express.json({ limit: '10mb' }));
+
+// ─────────────────────────────────────────────
+// BRAND LOGO AUTO-FETCH HELPER
+// ─────────────────────────────────────────────
+
+const BRAND_DOMAINS = {
+    apple: 'apple.com', samsung: 'samsung.com', oneplus: 'oneplus.com',
+    google: 'google.com', xiaomi: 'xiaomi.com', realme: 'realme.com',
+    oppo: 'oppo.com', vivo: 'vivo.com', nothing: 'nothing.technology',
+    motorola: 'motorola.com', dell: 'dell.com', hp: 'hp.com',
+    lenovo: 'lenovo.com', asus: 'asus.com', microsoft: 'microsoft.com',
+    acer: 'acer.com', msi: 'msi.com', razer: 'razer.com',
+    nokia: 'nokia.com', sony: 'sony.com', lg: 'lg.com',
+    huawei: 'huawei.com', poco: 'poco.com', iqoo: 'iqoo.com',
+    tecno: 'tecno-mobile.com', infinix: 'infinixmobility.com',
+};
+
+async function fetchAndSaveBrandLogo(brandName) {
+    const key = brandName.toLowerCase().replace(/\s+/g, '');
+    const domain = BRAND_DOMAINS[key] || `${key}.com`;
+    const clearbitUrl = `https://logo.clearbit.com/${domain}`;
+
+    const response = await fetch(clearbitUrl, {
+        redirect: 'follow',
+        headers: { 'User-Agent': 'Mozilla/5.0' },
+        signal: AbortSignal.timeout(8000),
+    });
+
+    if (!response.ok) throw new Error(`Logo not found for ${brandName} (${domain})`);
+
+    const contentType = response.headers.get('content-type') || 'image/png';
+    if (!contentType.startsWith('image/')) throw new Error('Response is not an image');
+
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    if (buffer.length > 2 * 1024 * 1024) throw new Error('Logo image exceeds 2MB limit');
+
+    const ext = contentType.includes('svg') ? 'svg' : contentType.includes('png') ? 'png' : 'jpg';
+    const filename = `brand-${brandName.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${Date.now()}.${ext}`;
+    const uploadsDir = path.join(__dirname, 'uploads');
+    if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+    fs.writeFileSync(path.join(uploadsDir, filename), buffer);
+
+    return `/uploads/${filename}`;
+}
 
 // Serve uploaded images
 const uploadsPath = path.join(__dirname, 'uploads');
@@ -215,7 +262,25 @@ app.post('/api/products', authMiddleware, isAdmin, async (req, res) => {
 
 app.put('/api/products/:id', authMiddleware, isAdmin, async (req, res) => {
     try {
-        const updatedProduct = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+        const { variants, ...productData } = req.body;
+        const updatedProduct = await Product.findByIdAndUpdate(req.params.id, productData, { new: true, runValidators: true });
+
+        if (variants && Array.isArray(variants)) {
+            const existingVariants = await Variant.find({ productId: req.params.id });
+            const existingIds = existingVariants.map(v => v._id.toString());
+
+            const toUpdate = variants.filter(v => v._id);
+            const toCreate = variants.filter(v => !v._id);
+            const incomingIds = toUpdate.map(v => v._id.toString());
+            const toDelete = existingIds.filter(id => !incomingIds.includes(id));
+
+            await Promise.all([
+                ...toUpdate.map(v => Variant.findByIdAndUpdate(v._id, v, { new: true })),
+                toCreate.length > 0 ? Variant.insertMany(toCreate.map(v => ({ ...v, productId: req.params.id }))) : Promise.resolve(),
+                toDelete.length > 0 ? Variant.deleteMany({ _id: { $in: toDelete } }) : Promise.resolve()
+            ]);
+        }
+
         res.json(updatedProduct);
     } catch (err) {
         res.status(400).json({ message: err.message });
@@ -352,9 +417,30 @@ app.get('/api/brands', async (req, res) => {
     }
 });
 
+// Fetch brand logo from Clearbit and save locally
+app.post('/api/brands/fetch-logo', authMiddleware, isAdmin, async (req, res) => {
+    const { brandName } = req.body;
+    if (!brandName?.trim()) return res.status(400).json({ message: 'Brand name required' });
+    try {
+        const url = await fetchAndSaveBrandLogo(brandName.trim());
+        res.json({ url });
+    } catch (err) {
+        res.status(404).json({ message: err.message || 'Logo not found' });
+    }
+});
+
 app.post('/api/brands', authMiddleware, isAdmin, async (req, res) => {
     try {
-        const brand = new Brand(req.body);
+        const brandData = { ...req.body };
+        // Auto-fetch logo from Clearbit if no image provided
+        if (!brandData.image && brandData.name) {
+            try {
+                brandData.image = await fetchAndSaveBrandLogo(brandData.name);
+            } catch (err) {
+                console.log(`Auto-fetch logo skipped for "${brandData.name}": ${err.message}`);
+            }
+        }
+        const brand = new Brand(brandData);
         await brand.save();
         res.status(201).json(brand);
     } catch (err) {
@@ -369,6 +455,37 @@ app.put('/api/brands/:id', authMiddleware, isAdmin, async (req, res) => {
     } catch (err) {
         res.status(400).json({ message: err.message });
     }
+});
+
+// Auto-fetch and save logo for a specific existing brand (updates DB)
+app.post('/api/brands/:id/fetch-logo', authMiddleware, isAdmin, async (req, res) => {
+    try {
+        const brand = await Brand.findById(req.params.id);
+        if (!brand) return res.status(404).json({ message: 'Brand not found' });
+        const imageUrl = await fetchAndSaveBrandLogo(brand.name);
+        brand.image = imageUrl;
+        await brand.save();
+        res.json({ url: imageUrl, brand });
+    } catch (err) {
+        res.status(404).json({ message: err.message || 'Logo not found' });
+    }
+});
+
+// Bulk auto-fetch logos for all brands missing images
+app.post('/api/brands/fetch-all-logos', authMiddleware, isAdmin, async (req, res) => {
+    const brandsWithoutLogos = await Brand.find({ $or: [{ image: '' }, { image: null }] });
+    const results = { success: [], failed: [] };
+    for (const brand of brandsWithoutLogos) {
+        try {
+            const imageUrl = await fetchAndSaveBrandLogo(brand.name);
+            brand.image = imageUrl;
+            await brand.save();
+            results.success.push(brand.name);
+        } catch (err) {
+            results.failed.push({ name: brand.name, reason: err.message });
+        }
+    }
+    res.json({ ...results, total: brandsWithoutLogos.length });
 });
 
 app.delete('/api/brands/:id', authMiddleware, isAdmin, async (req, res) => {
@@ -566,14 +683,14 @@ const upload = multer({
 
 app.post('/api/upload', authMiddleware, isAdmin, upload.single('image'), (req, res) => {
     if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
-    const fileUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+    const fileUrl = `/uploads/${req.file.filename}`;
     res.json({ url: fileUrl });
 });
 
 // Upload multiple images at once (up to 4)
 app.post('/api/upload/multiple', authMiddleware, isAdmin, upload.array('images', 4), (req, res) => {
     if (!req.files || req.files.length === 0) return res.status(400).json({ message: 'No files uploaded' });
-    const urls = req.files.map(f => `${req.protocol}://${req.get('host')}/uploads/${f.filename}`);
+    const urls = req.files.map(f => `/uploads/${f.filename}`);
     res.json({ urls });
 });
 
@@ -581,7 +698,7 @@ app.post('/api/upload/multiple', authMiddleware, isAdmin, upload.array('images',
 // SPA CATCH-ALL
 // ─────────────────────────────────────────────
 
-app.get(/^(?!\/api).*$/, (req, res) => {
+app.get(/^(?!\/api|\/uploads).*$/, (req, res) => {
     res.sendFile(path.join(distPath, 'index.html'));
 });
 

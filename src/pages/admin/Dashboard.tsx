@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, Fragment } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Trash2, Plus, Edit, X, Package, BarChart3, TrendingUp, Smartphone, Laptop, Tag, Link as LinkIcon, AlertCircle, ChevronDown, Check, ShoppingCart, Star, LogOut, LayoutDashboard, Pencil, Users, Menu, Bell, Layers, Search, Filter, RefreshCw, ArrowLeft, Clock, Truck, CheckCircle } from "lucide-react";
+import { Trash2, Plus, Edit, X, Package, BarChart3, TrendingUp, Smartphone, Laptop, Tag, Link as LinkIcon, AlertCircle, ChevronDown, Check, ShoppingCart, Star, LogOut, LayoutDashboard, Pencil, Users, Menu, Bell, Layers, Search, Filter, RefreshCw, ArrowLeft, Clock, Truck, CheckCircle, Loader2, Wand2, Globe } from "lucide-react";
 import { useData } from "@/context/DataContext";
 import { useAuth } from "@/context/AuthContext";
 import { Product, Category, Offer, ProductModel, Variant, Brand } from "@/data/products";
@@ -36,6 +36,81 @@ const emptySpecs = () => ({
   ramSize: "", os: "", specialFeature: "", graphicsCard: "",
   battery: "", displaySize: "", camera: ""
 });
+
+// ─── BRAND DOMAIN MAP (mirrors server BRAND_DOMAINS) ───
+const BRAND_DOMAINS: Record<string, string> = {
+  apple: 'apple.com', samsung: 'samsung.com', oneplus: 'oneplus.com',
+  google: 'google.com', xiaomi: 'xiaomi.com', realme: 'realme.com',
+  oppo: 'oppo.com', vivo: 'vivo.com', nothing: 'nothing.technology',
+  motorola: 'motorola.com', dell: 'dell.com', hp: 'hp.com',
+  lenovo: 'lenovo.com', asus: 'asus.com', microsoft: 'microsoft.com',
+  acer: 'acer.com', msi: 'msi.com', razer: 'razer.com',
+  nokia: 'nokia.com', sony: 'sony.com', lg: 'lg.com',
+  huawei: 'huawei.com', poco: 'poco.com', iqoo: 'iqoo.com',
+  tecno: 'tecno-mobile.com', infinix: 'infinixmobility.com',
+};
+const getBrandDomain = (name: string) => {
+  const key = name.toLowerCase().replace(/\s+/g, '');
+  return BRAND_DOMAINS[key] || `${key}.com`;
+};
+
+// ─── BRAND CARD ───
+const BrandCard = ({ brand, categoryName, onEdit, onDelete }: { brand: Brand; categoryName: string; onEdit: () => void; onDelete: () => void }) => {
+  const [fetching, setFetching] = useState(false);
+  const [imgSrc, setImgSrc] = useState(brand.image || "");
+
+  const handleAutoFetch = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setFetching(true);
+    try {
+      const token = localStorage.getItem("aaro_token");
+      const res = await fetch(`${API_URL}/brands/${brand._id || brand.id}/fetch-logo`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      setImgSrc(data.url);
+      toast.success(`Logo fetched for ${brand.name}!`);
+    } catch (err: any) {
+      toast.error(err.message || "Logo not found");
+    } finally {
+      setFetching(false);
+    }
+  };
+
+  return (
+    <Card className="border-none shadow-sm rounded-3xl p-5 group hover:shadow-xl transition-all duration-300 text-center relative overflow-hidden">
+      <div className="w-16 h-16 mx-auto rounded-2xl bg-secondary/50 flex items-center justify-center mb-3 overflow-hidden border border-border relative">
+        {imgSrc
+          ? <img src={imgSrc} alt={brand.name} className="w-full h-full object-contain p-2 grayscale" />
+          : fetching
+            ? <Loader2 className="w-6 h-6 text-primary animate-spin" />
+            : <Tag className="w-6 h-6 text-muted-foreground" />
+        }
+      </div>
+      <h4 className="text-sm font-black text-[#1a1f36] mb-0.5 truncate">{brand.name}</h4>
+      {categoryName && <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider mb-2">{categoryName}</p>}
+
+      {/* Action buttons */}
+      <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-white via-white to-transparent translate-y-full group-hover:translate-y-0 transition-transform flex justify-center gap-1.5">
+        {!imgSrc && (
+          <Button
+            variant="outline" size="icon"
+            onClick={handleAutoFetch}
+            disabled={fetching}
+            title="Auto-fetch logo"
+            className="w-8 h-8 rounded-lg bg-primary/5 border-primary/20 text-primary hover:bg-primary hover:text-white"
+          >
+            {fetching ? <Loader2 className="w-3 h-3 animate-spin" /> : <Wand2 className="w-3 h-3" />}
+          </Button>
+        )}
+        <Button variant="outline" size="icon" onClick={onEdit} className="w-8 h-8 rounded-lg bg-white"><Pencil className="w-3 h-3" /></Button>
+        <Button variant="ghost" size="icon" onClick={onDelete} className="h-8 w-8 rounded-lg hover:bg-destructive/10 hover:text-destructive bg-white"><Trash2 className="w-3 h-3" /></Button>
+      </div>
+    </Card>
+  );
+};
 
 const AdminDashboard = () => {
   const { products, categories, brands, activeOffer, offers, models, loading, addProduct, updateProduct, deleteProduct, addCategory, updateCategory, deleteCategory, addBrand, updateBrand, deleteBrand, addOffer, updateOffer, deleteOffer, fetchModelsByCategory, fetchVariants } = useData();
@@ -213,7 +288,7 @@ const AdminDashboard = () => {
   // ── Offer Form State ──
   const [showOfferForm, setShowOfferForm] = useState(false);
   const [editingOffer, setEditingOffer] = useState<Offer | null>(null);
-  const [offerForm, setOfferForm] = useState({ title: "", image: "", active: false });
+  const [offerForm, setOfferForm] = useState({ title: "", image: "", active: false, tag: "" });
 
   // ── Popup Offer Form State ──
   const [showPopupForm, setShowPopupForm] = useState(false);
@@ -248,6 +323,7 @@ const AdminDashboard = () => {
       title: offer?.title || "",
       image: offer?.image || "",
       active: offer?.active || false,
+      tag: offer?.tag || "",
     });
     setShowOfferForm(true);
   };
@@ -256,10 +332,10 @@ const AdminDashboard = () => {
     if (!offerForm.image) return toast.error("Please upload an offer banner image");
     try {
       if (editingOffer) {
-        await updateOffer({ ...editingOffer, title: offerForm.title || "Offer", image: offerForm.image, active: offerForm.active, description: editingOffer.description || "", discount: editingOffer.discount || 0, code: editingOffer.code || "" });
+        await updateOffer({ ...editingOffer, title: offerForm.title || "Offer", image: offerForm.image, active: offerForm.active, tag: offerForm.tag, description: editingOffer.description || "", discount: editingOffer.discount || 0, code: editingOffer.code || "" });
         toast.success("Offer updated!");
       } else {
-        await addOffer({ title: offerForm.title || "Offer", image: offerForm.image, active: offerForm.active, description: "", discount: 0, code: "" });
+        await addOffer({ title: offerForm.title || "Offer", image: offerForm.image, active: offerForm.active, tag: offerForm.tag, description: "", discount: 0, code: "" });
         toast.success("Offer created!");
       }
       setShowOfferForm(false);
@@ -273,6 +349,12 @@ const AdminDashboard = () => {
   const [phonePage, setPhonePage] = useState(1);
   const [laptopPage, setLaptopPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
+  const [expandedProducts, setExpandedProducts] = useState<Set<string>>(new Set());
+  const toggleExpand = (id: string) => setExpandedProducts(prev => {
+    const next = new Set(prev);
+    next.has(id) ? next.delete(id) : next.add(id);
+    return next;
+  });
   const [showFeaturedProductModal, setShowFeaturedProductModal] = useState(false);
   const [featuredSearch, setFeaturedSearch] = useState("");
 
@@ -346,11 +428,11 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-[#f8f9fc] flex overflow-hidden font-sans">
       {isSidebarOpen && (
-        <div className="fixed inset-0 bg-black/60 z-40 lg:hidden" onClick={() => setIsSidebarOpen(false)} />
+        <div className="fixed inset-0 bg-black/60 z-40 xl:hidden" onClick={() => setIsSidebarOpen(false)} />
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-[#eaedf3] transform transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
+      <aside className={`fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-[#eaedf3] transform transition-transform duration-300 ease-in-out xl:relative xl:translate-x-0 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="h-full flex flex-col p-6">
           <div className="flex items-center justify-between mb-10 px-2">
             <div className="flex items-center gap-3">
@@ -359,7 +441,7 @@ const AdminDashboard = () => {
               </div>
               <span className="text-xl font-black text-[#1a1f36]">AARO<span className="text-primary italic">Admin</span></span>
             </div>
-            <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden p-2 text-[#a3acb9] hover:text-primary"><X className="w-6 h-6" /></button>
+            <button onClick={() => setIsSidebarOpen(false)} className="xl:hidden p-2 text-[#a3acb9] hover:text-primary"><X className="w-6 h-6" /></button>
           </div>
           <nav className="flex-1 space-y-1 overflow-y-auto pr-2">
             {[
@@ -370,7 +452,7 @@ const AdminDashboard = () => {
               { id: "orders", icon: ShoppingCart, label: "Orders" },
               { id: "offers", icon: Tag, label: "Offers" },
             ].map(item => (
-              <button key={item.id} onClick={() => { setActiveTab(item.id); if (window.innerWidth < 1024) setIsSidebarOpen(false); }}
+              <button key={item.id} onClick={() => { setActiveTab(item.id); if (window.innerWidth < 1280) setIsSidebarOpen(false); }}
                 className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl text-sm font-bold transition-all ${activeTab === item.id ? "bg-primary text-white shadow-lg shadow-primary/25" : "text-[#4f566b] hover:bg-[#f4f7fa]"}`}>
                 <item.icon className="w-5 h-5 flex-shrink-0" />
                 <span>{item.label}</span>
@@ -385,12 +467,12 @@ const AdminDashboard = () => {
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col h-screen overflow-hidden">
-        <header className="h-20 bg-white border-b border-[#eaedf3] px-4 lg:px-8 flex items-center justify-between shrink-0 sticky top-0 z-30">
-          <div className="flex items-center gap-4">
-            <button onClick={() => setIsSidebarOpen(true)} className={`lg:hidden p-2 text-[#a3acb9] hover:bg-secondary rounded-xl ${isSidebarOpen ? 'hidden' : 'block'}`}>
+        <header className="h-14 xl:h-20 bg-white border-b border-[#eaedf3] px-3 sm:px-4 xl:px-8 flex items-center justify-between shrink-0 sticky top-0 z-30">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <button onClick={() => setIsSidebarOpen(true)} className={`xl:hidden p-2 text-[#a3acb9] hover:bg-secondary rounded-xl ${isSidebarOpen ? 'hidden' : 'block'}`}>
               <Menu className="w-6 h-6" />
             </button>
-            <h2 className="text-xl font-black text-[#1a1f36] capitalize">{activeTab}</h2>
+            <h2 className="text-base sm:text-xl font-black text-[#1a1f36] capitalize">{activeTab}</h2>
           </div>
           <div className="flex items-center gap-3">
             <button className="relative p-2 text-[#a3acb9] hover:text-primary">
@@ -424,12 +506,12 @@ const AdminDashboard = () => {
           </div>
         </header>
 
-        <div className="flex-1 overflow-y-auto p-4 lg:p-8 bg-[#f8f9fc]">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-6 lg:p-8 bg-[#f8f9fc]">
           <Tabs value={activeTab} className="space-y-6 animate-fade-in mb-10">
 
             {/* OVERVIEW */}
             <TabsContent value="overview" className="mt-0 space-y-6 outline-none">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-3 lg:gap-4">
                 {[
                   { label: "Total Products", val: products.length, icon: Package, color: "text-blue-500", bg: "bg-blue-50" },
                   { label: "Categories", val: categories.length, icon: Layers, color: "text-purple-500", bg: "bg-purple-50" },
@@ -437,18 +519,18 @@ const AdminDashboard = () => {
                   { label: "Catalog Value", val: `₹${totalSales.toLocaleString()}`, icon: TrendingUp, color: "text-green-500", bg: "bg-green-50" },
                 ].map((s, i) => (
                   <Card key={i} className="border-none shadow-sm rounded-3xl group hover:shadow-xl transition-all duration-300">
-                    <CardContent className="p-6">
-                      <div className={`w-12 h-12 rounded-2xl ${s.bg} ${s.color} flex items-center justify-center mb-4 transition-transform group-hover:scale-110`}>
-                        <s.icon className="w-6 h-6" />
+                    <CardContent className="p-3 md:p-6 lg:p-6">
+                      <div className={`w-10 h-10 md:w-14 md:h-14 shrink-0 rounded-2xl ${s.bg} ${s.color} flex items-center justify-center mb-3 md:mb-5 transition-transform group-hover:scale-110`}>
+                        <s.icon className="w-5 h-5 md:w-7 md:h-7" />
                       </div>
-                      <p className="text-[10px] font-black text-[#a3acb9] uppercase tracking-widest mb-1">{s.label}</p>
-                      <h4 className="text-2xl font-black text-[#1a1f36]">{s.val}</h4>
+                      <p className="text-[10px] md:text-xs font-black text-[#a3acb9] uppercase tracking-widest mb-0.5 md:mb-1">{s.label}</p>
+                      <h4 className="text-lg md:text-3xl lg:text-2xl font-black text-[#1a1f36]">{s.val}</h4>
                     </CardContent>
                   </Card>
                 ))}
               </div>
-              <Card className="border-none shadow-sm rounded-3xl p-6">
-                <CardTitle className="mb-4 font-black text-[#1a1f36]">Quick Actions</CardTitle>
+              <Card className="border-none shadow-sm rounded-3xl p-4 sm:p-6">
+                <CardTitle className="mb-3 sm:mb-4 font-black text-[#1a1f36] text-base sm:text-lg">Quick Actions</CardTitle>
                 <div className="flex flex-wrap gap-3">
                   <Button onClick={() => { setActiveTab("products"); handleOpenProductModal(); }} className="gradient-dark text-white rounded-xl font-black text-xs"><Plus className="w-4 h-4 mr-2" />Add Product</Button>
                   <Button onClick={() => { setActiveTab("categories"); openCategoryForm(); }} className="gradient-purple text-white rounded-xl font-black text-xs"><Plus className="w-4 h-4 mr-2" />Add Category</Button>
@@ -459,9 +541,9 @@ const AdminDashboard = () => {
 
             {/* PRODUCTS */}
             <TabsContent value="products" className="mt-0 space-y-4 outline-none">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-3xl shadow-sm">
-                <div><h3 className="text-xl font-black text-[#1a1f36]">Inventory</h3><p className="text-xs text-[#7a869a]">{products.length} products total</p></div>
-                <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white p-3 sm:p-4 lg:p-6 rounded-3xl shadow-sm">
+                <div><h3 className="text-base sm:text-xl font-black text-[#1a1f36]">Inventory</h3><p className="text-xs text-[#7a869a]">{products.length} products total</p></div>
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
                   <div className="relative flex-1 sm:flex-initial">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#a3acb9]" />
                     <input
@@ -498,7 +580,7 @@ const AdminDashboard = () => {
                 const paginatedProducts = catProducts.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
                 return (
                   <Card key={catName} className="border-none shadow-sm rounded-3xl overflow-hidden">
-                    <div className={`px-6 py-3 border-b flex items-center justify-between ${isPhone ? "bg-blue-50 border-blue-100" : "bg-violet-50 border-violet-100"}`}>
+                    <div className={`px-3 sm:px-6 py-3 border-b flex items-center justify-between ${isPhone ? "bg-blue-50 border-blue-100" : "bg-violet-50 border-violet-100"}`}>
                       <div className="flex items-center gap-2">
                         {isPhone ? <Smartphone className="w-4 h-4 text-blue-500" /> : <Laptop className="w-4 h-4 text-violet-500" />}
                         <span className={`text-xs font-black uppercase tracking-wider ${isPhone ? "text-blue-600" : "text-violet-600"}`}>{catName}</span>
@@ -512,18 +594,73 @@ const AdminDashboard = () => {
                         </div>
                       )}
                     </div>
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left min-w-[700px] border-collapse">
+                    {/* ── Mobile + Tablet Card List (< lg) ── */}
+                    <div className="xl:hidden divide-y divide-[#eaedf3]">
+                      {paginatedProducts.map(p => {
+                        const isExpanded = expandedProducts.has(p.id || (p as any)._id);
+                        const pid = p.id || (p as any)._id;
+                        const variants = p.variants && p.variants.length > 0 ? p.variants : [];
+                        return (
+                          <div key={pid}>
+                            {/* Compact row */}
+                            <div className="flex items-center gap-3 p-3">
+                              <div className="w-12 h-12 rounded-xl bg-white border border-[#eaedf3] shadow-sm flex items-center justify-center p-1 overflow-hidden shrink-0">
+                                {p.images?.[0] ? <img src={p.images[0]} alt={p.name} className="w-full h-full object-contain" /> : <Package className="w-5 h-5 text-muted-foreground" />}
+                              </div>
+                              <p className="flex-1 font-bold text-sm text-[#1a1f36] line-clamp-2 min-w-0">{p.name}</p>
+                              <button
+                                onClick={() => toggleExpand(pid)}
+                                className={`shrink-0 px-3 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-wide transition-all border ${isExpanded ? "bg-primary/10 text-primary border-primary/20" : "bg-[#f4f7fa] text-[#4f566b] border-[#eaedf3] hover:border-primary/30"}`}
+                              >
+                                {isExpanded ? "Close" : "View"}
+                              </button>
+                            </div>
+                            {/* Expanded detail panel */}
+                            {isExpanded && (
+                              <div className="px-3 pb-4 space-y-2 bg-[#fafbfd]">
+                                <div className="flex items-center justify-between mb-2">
+                                  <p className="text-[10px] font-black text-[#a3acb9] uppercase tracking-widest">{p.brand}</p>
+                                  <div className="flex items-center gap-1">
+                                    <Button variant="ghost" size="icon" onClick={() => handleOpenProductModal(p)} className="h-7 w-7 rounded-xl hover:bg-primary/10 hover:text-primary"><Pencil className="w-3 h-3" /></Button>
+                                    <Button variant="ghost" size="icon" onClick={() => deleteProduct(pid)} className="h-7 w-7 rounded-xl hover:bg-destructive/10 hover:text-destructive"><Trash2 className="w-3 h-3" /></Button>
+                                  </div>
+                                </div>
+                                {variants.length === 0 ? (
+                                  <p className="text-xs text-[#a3acb9] italic">No variants added</p>
+                                ) : (
+                                  variants.map((v, vi) => (
+                                    <div key={vi} className="flex flex-wrap items-center gap-2 bg-white border border-[#eaedf3] rounded-xl px-3 py-2">
+                                      <span className="text-[10px] font-black text-[#7a869a] bg-[#f4f7fa] px-2 py-0.5 rounded-lg">{v.ram}</span>
+                                      <span className="text-[10px] font-black text-[#7a869a] bg-[#f4f7fa] px-2 py-0.5 rounded-lg">{v.storage}</span>
+                                      <span className="text-[10px] font-black text-[#7a869a] bg-[#f4f7fa] px-2 py-0.5 rounded-lg">{v.color}</span>
+                                      <span className="text-xs font-black text-[#1a1f36] ml-auto">₹{v.price?.toLocaleString()}</span>
+                                      {(v.stock ?? 0) > 0
+                                        ? <span className="inline-flex items-center gap-1 bg-green-50 text-green-600 border border-green-100 text-[10px] font-black px-2 py-0.5 rounded-lg"><span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" />{v.stock}</span>
+                                        : <span className="inline-flex items-center gap-1 bg-red-50 text-red-500 border border-red-100 text-[10px] font-black px-2 py-0.5 rounded-lg"><span className="w-1.5 h-1.5 rounded-full bg-red-400 inline-block" />Out</span>
+                                      }
+                                    </div>
+                                  ))
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* ── Laptop/Desktop Table (lg+) ── */}
+                    <div className="hidden xl:block overflow-x-auto">
+                      <table className="w-full text-left md:min-w-0 border-collapse">
                         <thead className="bg-white text-[10px] font-black uppercase text-[#a3acb9] tracking-widest border-b border-[#eaedf3]">
-                          <tr className="h-12">
-                            <th className="px-6">Product</th>
-                            <th className="px-6">Brand</th>
-                            <th className="px-5">RAM</th>
-                            <th className="px-5">Storage</th>
-                            <th className="px-5">Color</th>
-                            <th className="px-5">Price</th>
-                            <th className="px-5">Stock</th>
-                            <th className="px-5 text-right">Actions</th>
+                          <tr className="h-10 sm:h-12">
+                            <th className="px-3 sm:px-6">Product</th>
+                            <th className="px-3 sm:px-6">Brand</th>
+                            <th className="px-3 sm:px-5">RAM</th>
+                            <th className="px-3 sm:px-5">Storage</th>
+                            <th className="px-3 sm:px-5">Color</th>
+                            <th className="px-3 sm:px-5">Price</th>
+                            <th className="px-3 sm:px-5">Stock</th>
+                            <th className="px-3 sm:px-5 text-right">Actions</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -536,26 +673,26 @@ const AdminDashboard = () => {
                                   <tr key={vi} className={`hover:bg-[#f8f9fc] transition-colors ${vi < rows.length - 1 ? "border-b border-dashed border-[#f0f2f7]" : "border-b border-[#eaedf3]"}`}>
                                     {vi === 0 && (
                                       <>
-                                        <td rowSpan={rows.length} className="px-6 py-3 align-middle border-r border-[#f0f2f7]">
-                                          <div className="flex items-center gap-3">
-                                            <div className="w-11 h-11 rounded-xl bg-white border border-[#eaedf3] shadow-sm flex items-center justify-center p-1 overflow-hidden shrink-0">
+                                        <td rowSpan={rows.length} className="px-3 sm:px-6 py-2 sm:py-3 align-middle border-r border-[#f0f2f7]">
+                                          <div className="flex items-center gap-2 sm:gap-3">
+                                            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white border border-[#eaedf3] shadow-sm flex items-center justify-center p-1 overflow-hidden shrink-0">
                                               {p.images?.[0] ? <img src={p.images[0]} alt={p.name} className="w-full h-full object-contain" /> : <Package className="w-5 h-5 text-muted-foreground" />}
                                             </div>
-                                            <span className="font-bold text-[#1a1f36] text-sm line-clamp-2 max-w-[160px]">{p.name}</span>
+                                            <span className="font-bold text-[#1a1f36] text-xs sm:text-sm line-clamp-2 max-w-[120px] sm:max-w-[160px]">{p.name}</span>
                                           </div>
                                         </td>
-                                        <td rowSpan={rows.length} className="px-6 align-middle text-[#7a869a] text-xs font-semibold border-r border-[#f0f2f7]">{p.brand}</td>
+                                        <td rowSpan={rows.length} className="px-3 sm:px-6 align-middle text-[#7a869a] text-xs font-semibold border-r border-[#f0f2f7]">{p.brand}</td>
                                       </>
                                     )}
-                                    <td className="px-5 py-2.5 text-xs font-bold text-[#1a1f36]">{v?.ram || <span className="text-[#d0d5dd]">—</span>}</td>
-                                    <td className="px-5 py-2.5 text-xs font-bold text-[#1a1f36]">{v?.storage || <span className="text-[#d0d5dd]">—</span>}</td>
-                                    <td className="px-5 py-2.5 text-xs font-bold text-[#1a1f36]">{v?.color || <span className="text-[#d0d5dd]">—</span>}</td>
-                                    <td className="px-5 py-2.5">
+                                    <td className="px-3 sm:px-5 py-2 text-xs font-bold text-[#8a92a6]">{v?.ram || <span className="text-[#d0d5dd]">—</span>}</td>
+                                    <td className="px-3 sm:px-5 py-2 text-xs font-bold text-[#8a92a6]">{v?.storage || <span className="text-[#d0d5dd]">—</span>}</td>
+                                    <td className="px-3 sm:px-5 py-2 text-xs font-bold text-[#8a92a6]">{v?.color || <span className="text-[#d0d5dd]">—</span>}</td>
+                                    <td className="px-3 sm:px-5 py-2">
                                       {v ? (
-                                        <span className="font-black text-[#1a1f36] text-sm">₹{v.price?.toLocaleString()}</span>
+                                        <span className="font-black text-[#8a92a6] text-sm">₹{v.price?.toLocaleString()}</span>
                                       ) : <span className="text-[#d0d5dd] text-xs">No variants</span>}
                                     </td>
-                                    <td className="px-5 py-2.5">
+                                    <td className="px-3 sm:px-5 py-2">
                                       {v ? (
                                         (v.stock ?? 0) > 0
                                           ? <span className="inline-flex items-center gap-1 bg-green-50 text-green-600 border border-green-100 text-[10px] font-black px-2 py-1 rounded-lg">
@@ -568,7 +705,7 @@ const AdminDashboard = () => {
                                             </span>
                                       ) : <span className="text-[#d0d5dd] text-xs">—</span>}
                                     </td>
-                                    <td className="px-5 py-2.5 text-right">
+                                    <td className="px-3 sm:px-5 py-2 text-right">
                                       <div className="flex items-center justify-end gap-1">
                                         <Button variant="ghost" size="icon" onClick={() => handleOpenProductModal(p)} className="h-8 w-8 rounded-xl hover:bg-primary/10 hover:text-primary"><Pencil className="w-3.5 h-3.5" /></Button>
                                         <Button variant="ghost" size="icon" onClick={() => deleteProduct(p.id)} className="h-8 w-8 rounded-xl hover:bg-destructive/10 hover:text-destructive"><Trash2 className="w-3.5 h-3.5" /></Button>
@@ -627,9 +764,33 @@ const AdminDashboard = () => {
               <div>
                 <div className="flex justify-between items-center bg-white p-6 rounded-3xl shadow-sm mb-4">
                   <div><h3 className="text-xl font-black text-[#1a1f36]">Brands</h3><p className="text-xs text-[#7a869a]">Manage featured product brands</p></div>
-                  <Button onClick={() => openBrandForm()} className="bg-[#1a1f36] hover:bg-[#2a3047] text-white rounded-2xl h-12 px-8 font-black uppercase text-[10px] tracking-widest transition-transform hover:scale-105">
-                    <Plus className="w-4 h-4 mr-2" />New Brand
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={async () => {
+                        const missingCount = brands.filter(b => !b.image).length;
+                        if (missingCount === 0) return toast.info("All brands already have logos");
+                        toast.info(`Fetching logos for ${missingCount} brand(s)…`);
+                        try {
+                          const token = localStorage.getItem("aaro_token");
+                          const res = await fetch(`${API_URL}/brands/fetch-all-logos`, {
+                            method: "POST",
+                            headers: { Authorization: `Bearer ${token}` },
+                          });
+                          const data = await res.json();
+                          if (data.success?.length) toast.success(`Fetched ${data.success.length} logo(s): ${data.success.join(", ")}`);
+                          if (data.failed?.length) toast.error(`Failed: ${data.failed.map((f: any) => f.name).join(", ")}`);
+                          window.location.reload();
+                        } catch { toast.error("Bulk fetch failed"); }
+                      }}
+                      className="rounded-2xl h-10 px-4 font-black uppercase text-[10px] tracking-widest border-primary/20 text-primary hover:bg-primary/5"
+                    >
+                      <Wand2 className="w-3.5 h-3.5 mr-1.5" />Fetch All Logos
+                    </Button>
+                    <Button onClick={() => openBrandForm()} className="bg-[#1a1f36] hover:bg-[#2a3047] text-white rounded-2xl h-10 px-6 font-black uppercase text-[10px] tracking-widest transition-transform hover:scale-105">
+                      <Plus className="w-4 h-4 mr-2" />New Brand
+                    </Button>
+                  </div>
                 </div>
                 <div className="space-y-8">
                   {categories.map(c => {
@@ -642,18 +803,7 @@ const AdminDashboard = () => {
                         </h4>
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                           {catBrands.map(b => (
-                            <Card key={b.id} className="border-none shadow-sm rounded-3xl p-6 group hover:shadow-xl transition-all duration-300 text-center relative overflow-hidden">
-                              <div className="w-16 h-16 mx-auto rounded-2xl bg-secondary/50 flex items-center justify-center mb-4 overflow-hidden border border-border">
-                                {b.image ? <img src={b.image} alt={b.name} className="w-full h-full object-contain p-2" /> : <Tag className="w-6 h-6 text-muted-foreground" />}
-                              </div>
-                              <h4 className="text-base font-black text-[#1a1f36] mb-1">{b.name}</h4>
-                              <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">{c.name}</p>
-
-                              <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-white via-white to-transparent translate-y-full group-hover:translate-y-0 transition-transform flex justify-center gap-2">
-                                <Button variant="outline" size="icon" onClick={() => openBrandForm(b)} className="w-8 h-8 rounded-lg text-[10px] font-bold bg-white"><Pencil className="w-3 h-3" /></Button>
-                                <Button variant="ghost" size="icon" onClick={() => deleteBrand(b.id)} className="h-8 w-8 rounded-lg hover:bg-destructive/10 hover:text-destructive bg-white"><Trash2 className="w-3 h-3" /></Button>
-                              </div>
-                            </Card>
+                            <BrandCard key={b.id} brand={b} categoryName={c.name} onEdit={() => openBrandForm(b)} onDelete={() => deleteBrand(b.id)} />
                           ))}
                         </div>
                       </div>
@@ -666,17 +816,7 @@ const AdminDashboard = () => {
                       </h4>
                       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         {brands.filter(b => !categories.some(c => (c.slug || c.name.toLowerCase()) === b.category)).map(b => (
-                          <Card key={b.id} className="border-none shadow-sm rounded-3xl p-6 group hover:shadow-xl transition-all duration-300 text-center relative overflow-hidden">
-                            <div className="w-16 h-16 mx-auto rounded-2xl bg-secondary/50 flex items-center justify-center mb-4 overflow-hidden border border-border">
-                              {b.image ? <img src={b.image} alt={b.name} className="w-full h-full object-contain p-2" /> : <Tag className="w-6 h-6 text-muted-foreground" />}
-                            </div>
-                            <h4 className="text-base font-black text-[#1a1f36] mb-1">{b.name}</h4>
-
-                            <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-white via-white to-transparent translate-y-full group-hover:translate-y-0 transition-transform flex justify-center gap-2">
-                              <Button variant="outline" size="icon" onClick={() => openBrandForm(b)} className="w-8 h-8 rounded-lg text-[10px] font-bold bg-white"><Pencil className="w-3 h-3" /></Button>
-                              <Button variant="ghost" size="icon" onClick={() => deleteBrand(b.id)} className="h-8 w-8 rounded-lg hover:bg-destructive/10 hover:text-destructive bg-white"><Trash2 className="w-3 h-3" /></Button>
-                            </div>
-                          </Card>
+                          <BrandCard key={b.id} brand={b} categoryName="" onEdit={() => openBrandForm(b)} onDelete={() => deleteBrand(b.id)} />
                         ))}
                       </div>
                     </div>
@@ -1004,6 +1144,9 @@ const AdminDashboard = () => {
                       {offer.active && (
                         <div className="absolute top-3 right-3 bg-green-500 text-white text-[9px] font-black px-2 py-1 rounded-full">ACTIVE</div>
                       )}
+                      {offer.tag && (
+                        <div className="absolute bottom-3 left-3 bg-primary text-white text-[9px] font-black px-2.5 py-1 rounded-full tracking-wider">{offer.tag}</div>
+                      )}
                     </div>
                     <div className="p-4">
                       <p className="font-black text-[#1a1f36] text-sm mb-3 truncate">{offer.title || "Untitled Banner"}</p>
@@ -1104,6 +1247,32 @@ const AdminDashboard = () => {
                   <label className="text-[10px] font-black uppercase text-[#7a869a] tracking-widest ml-1 transition-colors group-focus-within:text-primary">Description *</label>
                   <textarea rows={3} value={formData.description || ""} onChange={e => setFormData({ ...formData, description: e.target.value })}
                     className="w-full rounded-2xl border-[#eaedf3] p-4 text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary/40 outline-none border shadow-sm resize-none transition-all focus:shadow-md" placeholder="Enter compelling product details..." />
+                </div>
+
+                {/* Offer Tag */}
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase text-[#7a869a] tracking-widest ml-1">Offer Tag <span className="text-[#b0b8c9] normal-case font-medium">(badge on product card)</span></label>
+                  <div className="flex flex-wrap gap-2">
+                    {["", "NEW", "HOT", "SALE", "TRENDING", "BESTSELLER", "LIMITED",
+                      ...Array.from(new Set(offers.filter(o => o.tag && o.title !== "__popup__").map(o => o.tag as string)))
+                    ].filter((t, i, arr) => arr.indexOf(t) === i).map(tag => (
+                      <button
+                        key={tag || "none"}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, tag: tag || undefined })}
+                        className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider border transition-all ${
+                          (formData.tag || "") === tag
+                            ? "bg-primary text-white border-primary shadow-md shadow-primary/20"
+                            : "bg-white text-[#7a869a] border-[#eaedf3] hover:border-primary/30 hover:text-primary"
+                        }`}
+                      >
+                        {tag || "None"}
+                      </button>
+                    ))}
+                  </div>
+                  {formData.tag && (
+                    <p className="text-[10px] text-[#7a869a] ml-1">Tag <span className="font-black text-primary">{formData.tag}</span> will appear as a badge on the product card.</p>
+                  )}
                 </div>
               </div>
 
@@ -1274,8 +1443,10 @@ const AdminDashboard = () => {
               <Button variant="ghost" size="icon" onClick={() => setShowBrandForm(false)} className="rounded-full h-10 w-10"><X className="w-5 h-5" /></Button>
             </div>
             <div className="p-8 space-y-4">
-              <div className="space-y-2"><label className="text-[10px] font-black uppercase text-[#7a869a] tracking-widest">Name *</label>
-                <Input value={brandForm.name} onChange={e => setBrandForm({ ...brandForm, name: e.target.value })} className="rounded-2xl h-12" placeholder="Brand name" /></div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase text-[#7a869a] tracking-widest">Name *</label>
+                <Input value={brandForm.name} onChange={e => setBrandForm({ ...brandForm, name: e.target.value })} className="rounded-2xl h-12" placeholder="e.g. Apple, Samsung, Dell" />
+              </div>
 
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase text-[#7a869a] tracking-widest">Category *</label>
@@ -1294,6 +1465,7 @@ const AdminDashboard = () => {
                 </div>
               </div>
 
+              {/* Brand Logo */}
               <ImageUpload
                 label="Brand Logo"
                 value={brandForm.image}
@@ -1330,6 +1502,20 @@ const AdminDashboard = () => {
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase text-[#7a869a] tracking-widest">Label (for admin reference)</label>
                 <Input value={offerForm.title} onChange={e => setOfferForm({ ...offerForm, title: e.target.value })} className="rounded-2xl h-12" placeholder="e.g. Summer Sale Banner" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase text-[#7a869a] tracking-widest">Offer Tag <span className="text-[#b0b8c9] normal-case font-medium">(short badge shown on banner)</span></label>
+                <div className="relative">
+                  <Input
+                    value={offerForm.tag}
+                    onChange={e => setOfferForm({ ...offerForm, tag: e.target.value.toUpperCase().slice(0, 20) })}
+                    className="rounded-2xl h-12 pr-16"
+                    placeholder="e.g. FLASH SALE"
+                  />
+                  {offerForm.tag && (
+                    <span className="absolute right-4 top-1/2 -translate-y-1/2 bg-primary text-white text-[9px] font-black px-2 py-0.5 rounded-full">{offerForm.tag}</span>
+                  )}
+                </div>
               </div>
               <label className="flex items-center gap-3 cursor-pointer p-4 rounded-2xl bg-[#f8f9fc] border border-[#eaedf3] hover:border-primary/30 transition-colors">
                 <input type="checkbox" checked={offerForm.active} onChange={e => setOfferForm({ ...offerForm, active: e.target.checked })} className="w-5 h-5 accent-primary" />

@@ -52,6 +52,17 @@ const authHeaders = () => ({
     Authorization: `Bearer ${getToken()}`,
 });
 
+// Normalize image URLs: convert any stored absolute localhost URL to a relative path
+// so they work regardless of which port the server was on when they were uploaded.
+const normalizeImageUrl = (url: string): string => {
+    if (!url) return url;
+    try {
+        const parsed = new URL(url);
+        if (parsed.hostname === "localhost") return parsed.pathname;
+    } catch { /* not an absolute URL, leave as-is */ }
+    return url;
+};
+
 export const DataProvider = ({ children }: { children: ReactNode }) => {
     const [products, setProducts] = useState<Product[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
@@ -62,10 +73,14 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     const [activeOffer, setActiveOffer] = useState<Offer | null>(null);
     const [loading, setLoading] = useState(true);
 
-    const mapProduct = (p: any): Product => ({ ...p, id: p._id || p.id });
+    const mapProduct = (p: any): Product => ({
+        ...p,
+        id: p._id || p.id,
+        images: Array.isArray(p.images) ? p.images.map(normalizeImageUrl) : p.images,
+    });
     const mapCategory = (c: any): Category => ({ ...c, id: c._id || c.id });
     const mapBrand = (b: any): Brand => ({ ...b, id: b._id || b.id });
-    const mapOffer = (o: any): Offer => ({ ...o, id: o._id || o.id });
+    const mapOffer = (o: any): Offer => ({ ...o, id: o._id || o.id, image: normalizeImageUrl(o.image) });
     const mapReview = (r: any): Review => ({ ...r, id: r._id || r.id });
     const mapModel = (m: any): ProductModel => ({ ...m, id: m._id || m.id });
     const mapVariant = (v: any): Variant => ({ ...v, id: v._id || v.id });
