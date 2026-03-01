@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { Upload, X, Image as ImageIcon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001/api";
+const API_URL = import.meta.env.VITE_API_URL || "/api";
 
 interface ImageUploadProps {
     value: string;

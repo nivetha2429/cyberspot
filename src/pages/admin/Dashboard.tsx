@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ImageUpload, MultiImageUpload, VideoUpload } from "@/components/ImageUpload";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001/api";
+const API_URL = import.meta.env.VITE_API_URL || "/api";
 
 // ─────────────── SPEC FIELDS CONFIG ───────────────
 const PHONE_SPECS = ["os", "ramSize", "battery", "displaySize", "camera"];
@@ -1261,8 +1261,8 @@ const AdminDashboard = () => {
                         type="button"
                         onClick={() => setFormData({ ...formData, tag: tag || undefined })}
                         className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider border transition-all ${(formData.tag || "") === tag
-                            ? "bg-primary text-white border-primary shadow-md shadow-primary/20"
-                            : "bg-white text-[#7a869a] border-[#eaedf3] hover:border-primary/30 hover:text-primary"
+                          ? "bg-primary text-white border-primary shadow-md shadow-primary/20"
+                          : "bg-white text-[#7a869a] border-[#eaedf3] hover:border-primary/30 hover:text-primary"
                           }`}
                       >
                         {tag || "None"}
